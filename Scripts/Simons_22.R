@@ -825,6 +825,7 @@ egoplot
 #ggsave("interaction_plot.png", scatter_plot, height =5, width =25)
 
 ##Correlation matrix plot######
+#Still need to fix this
 
 #remove all non-numeric variables
 cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300,letter, gender, ethnicity, other_ethn, education, age, climate_scores))
