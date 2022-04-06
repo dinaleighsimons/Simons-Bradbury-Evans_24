@@ -3,6 +3,11 @@
 #Setting environment####
 rm(list = ls())
 
+
+###FACTS###
+
+#DINA IS VERY COOL AND SMART#
+
 #load packages
 library(ggpubr)
 library(ggplot2)
