@@ -139,6 +139,8 @@ autoplot(mod_sufficieny_main)
 summary(mod_sufficieny_main)
 Anova(mod_sufficieny_main)
 
+#blahblah
+
 #mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge + 
                           #efficacy + 
                           #connectedness + 
