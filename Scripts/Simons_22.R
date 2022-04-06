@@ -11,12 +11,13 @@ library(car)
 library(survey)
 library(Hmisc)
 library(corrplot)
+library(ggfortify)
 
 #test making a change for github
 #another test
 
 #read in data
-combined_data <- read.csv("combined_data_final.csv")
+combined_data <- read.csv("Data/combined_data_final.csv")
 str(combined_data)
 
 combined_data$financial = combined_data$financial - min(combined_data$financial) #make positive for model
@@ -504,12 +505,6 @@ nudge.finance <- combined_data %>%
             se = sd(financial)/sqrt(n()),
             samp_size = n())
 
-#read in data
-combined_data <- read.csv("combined_data_final.csv")
-str(combined_data)
-
-combined_data$financial = combined_data$financial - min(combined_data$financial) #make positive for model
-
 nudge.behaviour <- combined_data %>% 
   group_by(nudge) %>% 
   summarise(mean = mean(behaviour), 
@@ -632,7 +627,7 @@ nudge_plot <- ggarrange(ns, nsym, nf, nb,
                         ncol = 2, nrow = 2,
                         align = 'v')
 nudge_plot
-ggsave("nudge.png", nudge_plot, height =8, width = 6)
+ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 6)
 
 
 ##Mean and SE summary for message framing####
@@ -769,13 +764,12 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
 
 mb
 
-
 message_plot <- ggarrange(ms, msym, mf, mb,
                           labels = c("a", "b", "c", "d"),
                           ncol = 2, nrow = 2,
                           align = 'v')
 message_plot
-ggsave("new_message_plot.png", message_plot, height =9, width =7)
+ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =7)
 
 ##Scatter plots####
 
@@ -791,7 +785,7 @@ climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", 
                                                 labels = c("Biodiversity", "ES-global", "ES-local"))
 climateplot
 
-ggsave("sc_plot.png", width = 6)
+ggsave(path = "Figures", filename = "sc_plot.png", width = 6)
 
 natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
   geom_point(alpha=0.2)+
@@ -859,7 +853,7 @@ cor_plot<- corrplot(res, type = "full", order = "hclust",
          tl.col = "black", tl.srt = 45)
 
 
-##model sum plots####
+##Model summary plots####
 library(jtools)
 library(ggstance)
 
