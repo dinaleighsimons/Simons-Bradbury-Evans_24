@@ -3,11 +3,6 @@
 #Setting environment####
 rm(list = ls())
 
-
-###FACTS###
-
-#DINA IS VERY COOL AND SMART#
-
 #load packages
 library(ggpubr)
 library(ggplot2)
@@ -17,6 +12,13 @@ library(survey)
 library(Hmisc)
 library(corrplot)
 library(ggfortify)
+
+#read in data
+combined_data <- read.csv("Data/combined_data_final.csv")
+str(combined_data)
+
+#make financial positive for the model
+combined_data$financial = combined_data$financial - min(combined_data$financial)
 
 #Behaviour extra mods----
 mod_behaviour_int<- lm(behaviour ~ message_framing*ego +
@@ -334,5 +336,64 @@ Anova(mod_financial_int4, test = "F")
 
 
 #Don't use - message framing * flood not significant
+
+mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge + 
+                           efficacy + 
+                           connectedness + 
+                           allocated_wild_300 +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           sqrt(1+ climate_change) + 
+                           flood +
+                           MD_index, data = combined_data)
+autoplot(mod_sufficieny_int1)
+summary(mod_sufficieny_int1)
+Anova(mod_sufficieny_int1)
+
+#Don't use - message framing * nudge not significant
+
+mod_sufficieny_int2<- lm(sufficiency ~ message_framing*experience+
+                           nudge + 
+                           efficacy + 
+                           connectedness + 
+                           allocated_wild_300 +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           ego + 
+                           sqrt(1+ climate_change) + 
+                           flood +
+                           MD_index, data = combined_data)
+autoplot(mod_sufficieny_int2)
+summary(mod_sufficieny_int2)#Anova(mod_sufficieny_int2)
+
+#Don't use - message framing * experience not significant
+
+mod_sufficieny_int3<- lm(sufficiency ~ message_framing*sqrt(1+climate_change)+
+                           nudge + 
+                           efficacy + 
+                           connectedness + 
+                           allocated_wild_300 +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           flood +
+                           MD_index, data = combined_data)
+autoplot(mod_sufficieny_int3)
+summary(mod_sufficieny_int3)
+Anova(mod_sufficieny_int3)
+
+#Don't use - message framing * climate change not significant
 
 

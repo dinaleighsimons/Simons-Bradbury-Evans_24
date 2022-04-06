@@ -44,7 +44,6 @@ autoplot(mod_behaviour_main) #ok
 summary(mod_behaviour_main)
 Anova(mod_behaviour_main)
 
-
 ##Sympathy models----
 
 mod_sympathy_main<- lm(sympathy^(2) ~ message_framing+
@@ -138,68 +137,6 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
 autoplot(mod_sufficieny_main)
 summary(mod_sufficieny_main)
 Anova(mod_sufficieny_main)
-
-#blahblah
-
-#mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge + 
-                          #efficacy + 
-                          #connectedness + 
-                          #allocated_wild_300 +
-                          #finance_security + 
-                          #age +
-                          #gender +
-                          #ethnicity +
-                          #education_rank +
-                          #experience + 
-                          #ego + 
-                          #sqrt(1+ climate_change) + 
-                          #flood +
-                          #MD_index, data = combined_data)
-#autoplot(mod_sufficieny_int1)
-#summary(mod_sufficieny_int1)
-#Anova(mod_sufficieny_int1)
-
-#Don't use - message framing * nudge not significant
-
-#mod_sufficieny_int2<- lm(sufficiency ~ message_framing*experience+
-                          #nudge + 
-                          #efficacy + 
-                          #connectedness + 
-                          #allocated_wild_300 +
-                          #finance_security + 
-                          #age +
-                          #gender +
-                          #ethnicity +
-                          #education_rank +
-                          #ego + 
-                          #sqrt(1+ climate_change) + 
-                          #flood +
-                          #MD_index, data = combined_data)
-#autoplot(mod_sufficieny_int2)
-#summary(mod_sufficieny_int2)
-#Anova(mod_sufficieny_int2)
-
-#Don't use - message framing * experience not significant
-
-#mod_sufficieny_int3<- lm(sufficiency ~ message_framing*sqrt(1+climate_change)+
-                          #nudge + 
-                          #efficacy + 
-                          #connectedness + 
-                          #allocated_wild_300 +
-                          #finance_security + 
-                          #age +
-                          #gender +
-                          #ethnicity +
-                          #education_rank +
-                          #experience + 
-                          #ego + 
-                          #flood +
-                          #MD_index, data = combined_data)
-#autoplot(mod_sufficieny_int3)
-#summary(mod_sufficieny_int3)
-#Anova(mod_sufficieny_int3)
-
-#Don't use - message framing * climate change not significant
 
 #Plots#####
 ##Mean and SE summaries for nudge####
