@@ -1,8 +1,11 @@
-# Simons_22
+# STRATEGIC CONSERVATION MARKETING: TESTING THE INFLUENCE OF MESSAGE FRAMING, NUDGING TOOLS AND PSYCHOLOGY ON PUBLIC SUPPORT FOR ADVERTISEMENTS
+# Simons D-L, Evans KL & Bradbury RB
  
 **Overview**
 
-This document outlines the manuscript for Simons, Evans and Bradbury (2022).
+This document contains data, scripts and figures for the manuscript for Simons, Evans and Bradbury (in-prep). 
 
-**Files**
-
+**Important Files**
+Dataset - combined_data_final.csv
+Main script - Simons_22.R
+Extra script - Simons_22_extramods.R
