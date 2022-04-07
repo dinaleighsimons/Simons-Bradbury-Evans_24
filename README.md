@@ -8,6 +8,9 @@ This document contains data, scripts and figures for the manuscript for Simons, 
 
 **Important Files**
 
-Dataset - combined_data_final.csv
-Main script - Simons_22.R
-Extra script - Simons_22_extramods.R
+Dataset: combined_data_final.csv
+
+Main script: Simons_22.R
+
+Extra script: Simons_22_extramods.R
+
