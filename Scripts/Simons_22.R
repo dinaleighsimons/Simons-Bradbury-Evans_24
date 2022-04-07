@@ -184,7 +184,8 @@ nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
   theme(text = element_text(size = 13),
         legend.position = "none")+
   xlab("Nudge") + ylab("Financial support")+
-  ylim(0.95,1.26)+
+  #ylim(0.95,1.26)+
+  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -209,7 +210,8 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Advert sufficiency")+
-  ylim(11.3,13)+
+ #ylim(11.3,13)+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -233,13 +235,10 @@ nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Sympathetic attitudes")+
-  ylim(31.2,32.6)+
+  #ylim(31.2,32.6)+
+  scale_y_continuous(breaks = seq(0, 32.5, by=0.2), limits=c(31.2,32.5))+
   scale_x_discrete(labels = c("Absent","Present"))
-#geom_signif(comparisons = list(c("absent", "present")), 
-#map_signif_level=TRUE,
-#y_position = 32.5,
-#colour = "black",
-#annotations = "NS")
+
 nsym
 
 nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
@@ -255,13 +254,9 @@ nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
   theme(text = element_text(size = 13),
         legend.position = "none")+
   xlab("Nudge") + ylab("Behavioural support")+
-  ylim(51,56.2)+
+  #ylim(51,56.2)+
+  scale_y_continuous(breaks = seq(0, 56.2, by=0.8), limits=c(51,56.2))+
   scale_x_discrete(labels = c("Absent","Present"))
-#geom_signif(comparisons = list(c("absent", "present")), 
-#map_signif_level=TRUE,
-#y_position = 56,
-#colour = "black",
-#annotations = "NS")
 
 nb
 
@@ -315,20 +310,20 @@ message.summary$message_framing = as.factor(message.summary$message_framing)
 
 ##Message framing plot----
 
-ggplot(message.summary, aes(x=message_framing, y = mean, ymin = mean - se, ymax = mean + se)) +
-  geom_linerange(aes(color = type), size = 1, alpha = 0.5, position = position_dodge(width = 1)) +
-  geom_point(aes(color = type, shape = type), size = 2, position = position_dodge(width = 1))+
-  scale_x_discrete("Message framing", labels=c("Biodiveristy","ES-global", "ES-local")) + # here you define coordinates for A and B 
-  theme_classic()+
-  theme(text = element_text(size = 13))
+#ggplot(message.summary, aes(x=message_framing, y = mean, ymin = mean - se, ymax = mean + se)) +
+  #geom_linerange(aes(color = type), size = 1, alpha = 0.5, position = position_dodge(width = 1)) +
+  #geom_point(aes(color = type, shape = type), size = 2, position = position_dodge(width = 1))+
+  #scale_x_discrete("Message framing", labels=c("Biodiveristy","ES-global", "ES-local")) + # here you define coordinates for A and B 
+  #theme_classic()+
+  #theme(text = element_text(size = 13))
 
 
-ggplot(message.summary, aes(x=type, y = log(mean), ymin = log(mean) - log(sd/2), ymax = log(mean) + log(sd/2))) +
-  geom_linerange(aes(color = message_framing), size = 1, alpha = 0.5, position = position_dodge(width = 1)) +
-  geom_point(aes(color = message_framing, shape = message_framing), size = 2, position = position_dodge(width = 1))+
-  scale_x_discrete("Support type", labels=c("Behaviour","Finance", "Suff", "Symp")) + # here you define coordinates for A and B 
-  theme_classic()+
-  theme(text = element_text(size = 13))
+#ggplot(message.summary, aes(x=type, y = log(mean), ymin = log(mean) - log(sd/2), ymax = log(mean) + log(sd/2))) +
+  #geom_linerange(aes(color = message_framing), size = 1, alpha = 0.5, position = position_dodge(width = 1)) +
+  #geom_point(aes(color = message_framing, shape = message_framing), size = 2, position = position_dodge(width = 1))+
+  #scale_x_discrete("Support type", labels=c("Behaviour","Finance", "Suff", "Symp")) + # here you define coordinates for A and B 
+  #theme_classic()+
+  #theme(text = element_text(size = 13))
 
 
 mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_framing))+
@@ -344,7 +339,8 @@ mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_fr
   theme(text = element_text(size = 13),
         legend.position = "none")+
   xlab("Message framing") + ylab("Financial support")+
-  ylim(1,1.26)+
+  #ylim(0.95,1.26)+
+  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mf
@@ -364,7 +360,8 @@ ms <- ggplot(message.sufficiency, aes(x=message_framing, y=mean, colour = messag
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Advert sufficiency")+
-  ylim(11.3,13)+
+  #ylim(11.3,13)+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 ms
 
@@ -384,7 +381,8 @@ msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
   xlab("Message framing") + ylab("Sympathetic attitudes")+
-  ylim(31.2,32.6)+
+  #ylim(31.2,32.6)+
+  scale_y_continuous(breaks = seq(0, 32.5, by=0.2), limits=c(31.2,32.6))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 msym
@@ -402,7 +400,8 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
   theme(text = element_text(size = 13),
         legend.position = "none")+
   xlab("Message framing") + ylab("Behavioural support")+
-  ylim(52,55.5)+
+  #ylim(51,56.2)+
+  scale_y_continuous(breaks = seq(0, 56.2, by=0.5), limits=c(52,55.3))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mb
@@ -416,19 +415,19 @@ ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height
 
 ##Scatter plots----
 
-climateplot<- ggplot(combined_data, aes(x=sqrt(climate_change), y=sympathy^2, colour=message_framing))+
-  geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", alpha = 0.05)+
-  theme_classic()+
-  labs(x = expression(paste(sqrt("Climate change scepticism"))), y = expression(paste("Sympathetic attitudes"^2)))+
-  theme(text = element_text(size = 10))+
+climateplot<- ggplot(combined_data, aes(x=sqrt(climate_change), y=sympathy^2, colour = message_framing))+
+  geom_point(size=0.5) +
+  geom_smooth(method = "lm", alpha = 0.05, se = F, size = 0.7)+
+  theme_classic() +
+  labs(x = "Climate change scepticism (transformed)", y = "Sympathetic attitudes (transformed)")+
+  theme(text = element_text(size = 10)) +
   guides(color=guide_legend("Message framing"), fill = "none")
 
 climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
                                                 labels = c("Biodiversity", "ES-global", "ES-local"))
 climateplot
 
-ggsave(path = "Figures", filename = "sc_plot.png", width = 6)
+ggsave(path = "Figures", filename = "sc_plot.png", width = 7)
 
 natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
   geom_point(alpha=0.2)+
