@@ -1,4 +1,4 @@
-# Strategic conservation marketing: Testing the influence of message framing, nudge tools and psychology on public support for advertisements 
+# STRATEGIC CONSERVATION MARKETING: IMPACTS OF SELF-EFFICACY, ECOSYSTEM SERVICE MESSAGE FRAMING AND DYNAMIC SOCIAL NORMS ON PUBLIC SUPPORT FOR TROPICAL FOREST RESTORATION
 
 **Simons D-L, Bradbury RB & Evans KL**
  
