@@ -185,13 +185,15 @@ nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Financial support")+
   #ylim(0.95,1.26)+
-  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
+  scale_y_continuous(breaks = seq(0, 1.29, by=0.05), limits=c(0.95,1.29))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
               y_position = 1.25,
               colour = "black",
-              annotations = "*")
+              annotations = "*",
+              textsize = 8, 
+              size = 0.7)
 
 nf
 
@@ -217,7 +219,9 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
               map_signif_level=TRUE,
               y_position = 12.9,
               colour = "black",
-              annotations = "*")
+              annotations = "*",
+              textsize = 8, 
+              size = 0.7)
 ns
 
 nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
@@ -417,7 +421,7 @@ ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height
 
 climateplot<- ggplot(combined_data, aes(x=sqrt(climate_change), y=sympathy^2, colour = message_framing))+
   geom_point(size=0.5) +
-  geom_smooth(method = "lm", alpha = 0.05, se = F, size = 0.7)+
+  geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
   theme_classic() +
   labs(x = "Climate change scepticism (transformed)", y = "Sympathetic attitudes (transformed)")+
   theme(text = element_text(size = 10)) +
@@ -427,7 +431,7 @@ climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", 
                                                 labels = c("Biodiversity", "ES-global", "ES-local"))
 climateplot
 
-ggsave(path = "Figures", filename = "sc_plot.png", width = 7)
+ggsave(path = "Figures", filename = "sc_plot.png", width = 7, height = 4)
 
 natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
   geom_point(alpha=0.2)+
