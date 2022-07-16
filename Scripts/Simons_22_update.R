@@ -14,7 +14,7 @@ library(corrplot)
 library(ggfortify)
 
 #read in data
-combined_data <- read.csv("combined_data_PCA.csv")
+combined_data <- read.csv("Data/combined_data_PCA.csv")
 str(combined_data)
 
 #make positive for models
@@ -485,15 +485,28 @@ ggsave(path = "Figures", filename = "sc_plot.png", width = 8, height = 5)
 
 
 ##Correlation matrix plot----
-#Still need to fix this
 
 #remove all non-numeric variables
-cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300,letter, gender, ethnicity, other_ethn, education, age, climate_scores))
+cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores, fpc))
 cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
 #NAs <- cor_data[is.na(cor_data$MD_index),]
 cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
 
-colnames(cor_data) <- c("Allocation to wildlife", "Sympathetic attitudes", "Behavioural support", "Advert sufficiency", "Financial support", "Flood experience", "Climate change", "Social norm support", "Social norm donation", "Egoistical attitudes", "Self-efficacy", "Financial security", "Adversity experience", "Nature connectedness", "IMD", "Education")
+colnames(cor_data) <- c("Flood experience",
+                        "Social norm 'donation'",
+                        "Adversity awareness", 
+                        "Nature connection",
+                        "Financial support", 
+                        "Advert sufficiency", 
+                        "Social norm 'support'", 
+                        "Sympathetic attitudes",
+                        "Behavioural support", 
+                        "Self-efficacy", 
+                        "Climate change", 
+                        "Egoistical attitudes", 
+                        "Education", 
+                        "Financial security", 
+                        "Index of Multiple Deprivation")
 
 #compute a correlation matrix
 res<- cor(cor_data, method = "pearson", use = "complete.obs")
