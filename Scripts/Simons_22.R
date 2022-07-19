@@ -14,11 +14,13 @@ library(corrplot)
 library(ggfortify)
 
 #read in data
-combined_data <- read.csv("Data/combined_data_final.csv")
+combined_data <- read.csv("Data/combined_data_PCA.csv")
 str(combined_data)
 
-#make financial positive for the model
-combined_data$financial = combined_data$financial - min(combined_data$financial)
+#make positive for models
+combined_data$behaviour= combined_data$behaviour - min(combined_data$behaviour)
+combined_data$sympathy= combined_data$sympathy - min(combined_data$sympathy)
+combined_data$climate_scores= combined_data$climate_scores - min(combined_data$climate_scores)
 
 #Models####
 
@@ -28,7 +30,6 @@ mod_behaviour_main<- lm(behaviour ~ message_framing +
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
@@ -37,7 +38,7 @@ mod_behaviour_main<- lm(behaviour ~ message_framing +
                           education_rank +
                           experience + 
                           ego + 
-                          sqrt(1+climate_change) + 
+                          climate_scores+ 
                           flood+
                           MD_index, data = combined_data)
 autoplot(mod_behaviour_main) #ok
@@ -46,11 +47,10 @@ Anova(mod_behaviour_main)
 
 ##Sympathy models----
 
-mod_sympathy_main<- lm(sympathy^(2) ~ message_framing+
+mod_sympathy_main<- lm(sympathy ~ message_framing+
                          nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
@@ -59,18 +59,17 @@ mod_sympathy_main<- lm(sympathy^(2) ~ message_framing+
                          education_rank +
                          experience + 
                          ego + 
-                         sqrt(1+climate_change) + 
+                         climate_scores + 
                          flood +
                          MD_index, data = combined_data)
 autoplot(mod_sympathy_main)
 summary(mod_sympathy_main)
 Anova(mod_sympathy_main)
 
-mod_sympathy_int3<- lm(sympathy^(2) ~ message_framing*sqrt(1+climate_change)+
+mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
                          nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
@@ -93,7 +92,6 @@ mod_financial_main<- glm(financial ~ message_framing+
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            log(1 + social_norm_donation) +
                            finance_security + 
                            age +
@@ -102,7 +100,7 @@ mod_financial_main<- glm(financial ~ message_framing+
                            education_rank +
                            experience + 
                            ego + 
-                           sqrt(1+ climate_change) + 
+                           climate_scores + 
                            flood+
                            MD_index, data = combined_data, family = quasipoisson)
 par(mfrow=c(2,2))
@@ -123,7 +121,6 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            finance_security + 
                            age +
                            gender +
@@ -131,7 +128,7 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            education_rank +
                            experience + 
                            ego + 
-                           sqrt(1+ climate_change) + 
+                           climate_scores + 
                            flood +
                            MD_index, data = combined_data)
 autoplot(mod_sufficieny_main)
@@ -240,10 +237,17 @@ nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 32.5, by=0.2), limits=c(31.2,32.5))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.23,6.5))+
   scale_x_discrete(labels = c("Absent","Present"))
 
 nsym
+
+max(combined_data$sympathy)
+min(combined_data$sympathy)
+
+max(combined_data$behaviour)
+min(combined_data$behaviour)
+
 
 nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
   scale_color_manual(values=c("grey40", "sky blue"), 
@@ -259,8 +263,15 @@ nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 56.2, by=0.8), limits=c(51,56.2))+
-  scale_x_discrete(labels = c("Absent","Present"))
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.4,3.9))+
+  scale_x_discrete(labels = c("Absent","Present"))+
+  geom_signif(comparisons = list(c("absent", "present")), 
+              map_signif_level=TRUE,
+              y_position = 3.85,
+              colour = "black",
+              annotations = "*",
+              textsize = 8, 
+              size = 0.7)
 
 nb
 
@@ -386,7 +397,7 @@ msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message
         axis.text.x = element_blank())+
   xlab("Message framing") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 32.5, by=0.2), limits=c(31.2,32.6))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 msym
@@ -405,7 +416,7 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
         legend.position = "none")+
   xlab("Message framing") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 56.2, by=0.5), limits=c(52,55.3))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mb
@@ -419,11 +430,11 @@ ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height
 
 ##Scatter plots----
 
-climateplot<- ggplot(combined_data, aes(x=sqrt(climate_change), y=sympathy^2, colour = message_framing))+
+climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
   geom_point(size=0.5) +
   geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
   theme_classic() +
-  labs(x = "Climate change scepticism (transformed)", y = "Sympathetic attitudes (transformed)")+
+  labs(x = "Climate change scepticism", y = "Sympathetic attitudes (transformed)")+
   theme(text = element_text(size = 10)) +
   guides(color=guide_legend("Message framing"), fill = "none")
 
@@ -431,37 +442,37 @@ climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", 
                                                 labels = c("Biodiversity", "ES-global", "ES-local"))
 climateplot
 
-ggsave(path = "Figures", filename = "sc_plot.png", width = 7, height = 4)
+ggsave(path = "Figures", filename = "sc_plot.png", width = 8, height = 5)
 
-natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
-  geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=F)+
-  theme_classic()+
-  labs(x = "Nature connectedness", y = expression(paste("Sympathetic attitudes"^2)))+
-  theme(text = element_text(size = 15),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "none")+
-  guides(color=guide_legend("Message framing"), fill = "none")
+#natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
+  #geom_point(alpha=0.2)+
+  #geom_smooth(method = "lm", se=F)+
+  #theme_classic()+
+  #labs(x = "Nature connectedness", y = expression(paste("Sympathetic attitudes"^2)))+
+  #theme(text = element_text(size = 15),
+        #axis.title.y = element_blank(),
+        #axis.text.y = element_blank(),
+        #legend.position = "none")+
+  #guides(color=guide_legend("Message framing"), fill = "none")
 
-natureplot<- natureplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
-                                              labels = c("Biodiversity", "ES-global", "ES-local"))
-natureplot
+#natureplot<- natureplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
+                                              #labels = c("Biodiversity", "ES-global", "ES-local"))
+#natureplot
 
-egoplot<- ggplot(combined_data, aes(x=ego, y=sympathy^2, colour=message_framing))+
-  geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=F)+
-  theme_classic()+
-  labs(x = "Egoistical attitudes", y = expression(paste("Sympathetic attitudes"^2)))+
-  theme(text = element_text(size = 15),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        legend.position = "none")+
-  guides(color=guide_legend("Message framing"), fill = "none")
+#egoplot<- ggplot(combined_data, aes(x=ego, y=sympathy^2, colour=message_framing))+
+  #geom_point(alpha=0.2)+
+  #geom_smooth(method = "lm", se=F)+
+  #theme_classic()+
+  #labs(x = "Egoistical attitudes", y = expression(paste("Sympathetic attitudes"^2)))+
+  #theme(text = element_text(size = 15),
+        #axis.title.y = element_blank(),
+        #axis.text.y = element_blank(),
+        #legend.position = "none")+
+  #guides(color=guide_legend("Message framing"), fill = "none")
 
-egoplot<- egoplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
-                                        labels = c("Biodiversity", "ES-global", "ES-local"))
-egoplot
+#egoplot<- egoplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
+                                        #labels = c("Biodiversity", "ES-global", "ES-local"))
+#egoplot
 
 #scatter_plot <- ggarrange(climateplot, natureplot, egoplot,
                           #labels = c("a", "b", "c"),
@@ -470,16 +481,32 @@ egoplot
 #scatter_plot
 #ggsave("interaction_plot.png", scatter_plot, height =5, width =25)
 
+
+
+
 ##Correlation matrix plot----
-#Still need to fix this
 
 #remove all non-numeric variables
-cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300,letter, gender, ethnicity, other_ethn, education, age, climate_scores))
+cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores, fpc))
 cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
 #NAs <- cor_data[is.na(cor_data$MD_index),]
 cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
 
-colnames(cor_data) <- c("Allocation to wildlife", "Sympathetic attitudes", "Behavioural support", "Advert sufficiency", "Financial support", "Flood experience", "Climate change", "Social norm support", "Social norm donation", "Egoistical attitudes", "Self-efficacy", "Financial security", "Adversity experience", "Nature connectedness", "IMD", "Education")
+colnames(cor_data) <- c("Flood experience",
+                        "Social norm 'donation'",
+                        "Adversity awareness", 
+                        "Nature connection",
+                        "Financial support", 
+                        "Advert sufficiency", 
+                        "Social norm 'support'", 
+                        "Sympathetic attitudes",
+                        "Behavioural support", 
+                        "Self-efficacy", 
+                        "Climate change", 
+                        "Egoistical attitudes", 
+                        "Education", 
+                        "Financial security", 
+                        "Index of Multiple Deprivation")
 
 #compute a correlation matrix
 res<- cor(cor_data, method = "pearson", use = "complete.obs")
@@ -509,6 +536,340 @@ plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympat
 
 plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main, scale = TRUE, 
            model.names = c("Behaviour", "Sufficency", "Finance"))
+
+#Demographics####
+##Total####
+nrow(combined_data) #1116
+(nrow(subset(combined_data, age=="21"))/nrow(combined_data))*100 #10.46312
+(nrow(subset(combined_data, age=="29.5"))/nrow(combined_data))*100 #18.78216
+(nrow(subset(combined_data, age=="39.5"))/nrow(combined_data))*100 #18.01029
+(nrow(subset(combined_data, age=="49.5"))/nrow(combined_data))*100 #16.38079
+(nrow(subset(combined_data, age=="59.5"))/nrow(combined_data))*100 #25.04288
+(nrow(subset(combined_data, age=="69.5"))/nrow(combined_data))*100 #10.20583
+(nrow(subset(combined_data, age=="79.5"))/nrow(combined_data))*100 #1.02916
+(nrow(subset(combined_data, age=="89.5"))/nrow(combined_data))*100 #0.08576329
+
+(nrow(subset(combined_data, gender=="(1) Female"))/nrow(combined_data))*100 #50.77187
+(nrow(subset(combined_data, gender=="(3) Male"))/nrow(combined_data))*100 #48.79931
+(nrow(subset(combined_data, gender=="(2) Other"))/nrow(combined_data))*100 #0.4288165
+
+(nrow(subset(combined_data, ethnicity=="(1) White or Caucasian"))/nrow(combined_data))*100 #85.24871
+(nrow(subset(combined_data, ethnicity=="(2) Other"))/nrow(combined_data))*100 #14.75129
+
+library(plotrix)
+mean(combined_data$age) #45.84906
+std.error(combined_data$age) #0.4551066
+
+mean(combined_data$efficacy) #10.70497
+std.error(combined_data$efficacy) #0.1459724
+
+mean(combined_data$connectedness) #4.797027
+std.error(combined_data$connectedness) #0.03081535
+
+combined_data$experience= combined_data$experience - min(combined_data$experience)
+min(combined_data$experience) #0
+max(combined_data$experience) #7.27827
+
+mean(combined_data$experience) #5.010301
+std.error(combined_data$experience) #0.03571201
+
+combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
+min(combined_data$social_norm) #0
+max(combined_data$social_norm) #  7.016525
+
+mean(combined_data$social_norm) #4.620652
+std.error(combined_data$social_norm) #0.03685843
+
+min(combined_data$social_norm_donation) #0
+max(combined_data$social_norm_donation) #  7.016525
+
+mean(combined_data$social_norm_donation) #17.16639
+std.error(combined_data$social_norm_donation) #4.449253
+
+min(combined_data$climate_scores) #0
+max(combined_data$climate_scores) # 7.295522
+
+mean(combined_data$climate_scores) #1.634991
+std.error(combined_data$climate_scores) #0.0454186
+
+mean(combined_data$flood) #1.060892
+std.error(combined_data$flood) #0.08985149
+
+mean(combined_data$MD_index) #5.604631
+std.error(combined_data$MD_index) #0.08188735
+
+mean(combined_data$finance_security) #10.32933
+std.error(combined_data$finance_security) #0.1447148
+
+mean(combined_data$education_rank) #3.578045
+std.error(combined_data$education_rank) # 0.02884719
+
+##MS-BD####
+BD <- subset(combined_data, message_framing=="biodiversity")
+nrow(BD) #416
+(nrow(subset(BD, age=="21"))/nrow(BD))*100 #10.57692
+(nrow(subset(BD, age=="29.5"))/nrow(BD))*100 #18.26923
+(nrow(subset(BD, age=="39.5"))/nrow(BD))*100 #18.50962
+(nrow(subset(BD, age=="49.5"))/nrow(BD))*100 #18.75
+(nrow(subset(BD, age=="59.5"))/nrow(BD))*100 #24.75962
+(nrow(subset(BD, age=="69.5"))/nrow(BD))*100 #7.932692
+(nrow(subset(BD, age=="79.5"))/nrow(BD))*100 #1.201923
+(nrow(subset(BD, age=="89.5"))/nrow(BD))*100 #0
+
+(nrow(subset(BD, gender=="(1) Female"))/416)*100 #48.55769
+(nrow(subset(BD, gender=="(3) Male"))/416)*100 #50.96154
+(nrow(subset(BD, gender=="(2) Other"))/416)*100 #0.4807692
+
+(nrow(subset(BD, ethnicity=="(1) White or Caucasian"))/416)*100 # 87.01923
+(nrow(subset(BD, ethnicity=="(2) Other"))/416)*100 #12.98077
+
+mean(BD$age) #45.40385
+std.error(BD$age) #0.7412572
+
+mean(BD$efficacy) #10.48077
+std.error(BD$efficacy) #0.2464513
+
+mean(BD$connectedness) #4.780048
+std.error(BD$connectedness) #0.05226082
+
+mean(BD$experience) #4.92734
+std.error(BD$experience) #0.05969652
+
+mean(BD$social_norm) #4.592651
+std.error(BD$social_norm) #0.0623709
+
+mean(BD$social_norm_donation) #16.25962
+std.error(BD$social_norm_donation) #3.273502
+
+mean(BD$climate_scores) #1.613207
+std.error(BD$climate_scores) #0.07676703
+
+mean(BD$flood) #1.052885
+std.error(BD$flood) #0.1450216
+
+mean(BD$MD_index) #5.778846
+std.error(BD$MD_index) #0.1403287
+
+mean(BD$finance_security) #10.29988
+std.error(BD$finance_security) #0.2489119
+
+mean(BD$education_rank) #3.591346
+std.error(BD$education_rank) # 0.04569822
+
+
+##MS-ES-L####
+ES_L <- subset(combined_data, message_framing=="es-local")
+nrow(ES_L) #379
+(nrow(subset(ES_L, age=="21"))/nrow(ES_L))*100 #10.02639
+(nrow(subset(ES_L, age=="29.5"))/nrow(ES_L))*100 #20.05277
+(nrow(subset(ES_L, age=="39.5"))/nrow(ES_L))*100 #17.1504
+(nrow(subset(ES_L, age=="49.5"))/nrow(ES_L))*100 #13.45646
+(nrow(subset(ES_L, age=="59.5"))/nrow(ES_L))*100 #27.96834
+(nrow(subset(ES_L, age=="69.5"))/nrow(ES_L))*100 #10.81794
+(nrow(subset(ES_L, age=="79.5"))/nrow(ES_L))*100 #0.2638522
+(nrow(subset(ES_L, age=="89.5"))/nrow(ES_L))*100 #0.2638522
+
+(nrow(subset(ES_L, gender=="(1) Female"))/nrow(ES_L))*100 # 50.13193
+(nrow(subset(ES_L, gender=="(3) Male"))/nrow(ES_L))*100 #49.07652
+(nrow(subset(ES_L, gender=="(2) Other"))/nrow(ES_L))*100 #0.7915567
+
+(nrow(subset(ES_L, ethnicity=="(1) White or Caucasian"))/nrow(ES_L))*100 # 82.8496
+(nrow(subset(ES_L, ethnicity=="(2) Other"))/nrow(ES_L))*100 #17.1504
+
+mean(ES_L$age) #46.06201
+std.error(ES_L$age) #0.8047764
+
+mean(ES_L$efficacy) #10.97625
+std.error(ES_L$efficacy) #0.2543583
+
+mean(ES_L$connectedness) #4.840369
+std.error(ES_L$connectedness) #0.05474575
+
+mean(ES_L$experience) #5.077807
+std.error(ES_L$experience) #0.06477207
+
+mean(ES_L$social_norm) #4.673955
+std.error(ES_L$social_norm) #0.06408972
+
+mean(ES_L$social_norm_donation) # 24.64908
+std.error(ES_L$social_norm_donation) #13.19152
+
+mean(ES_L$climate_scores) #1.686988
+std.error(ES_L$climate_scores) #0.08275331
+
+mean(ES_L$flood) #1.097625
+std.error(ES_L$flood) # 0.1589908
+
+mean(ES_L$MD_index) #5.488127
+std.error(ES_L$MD_index) #0.1455912
+
+mean(ES_L$finance_security) #10.20646
+std.error(ES_L$finance_security) #0.2548791
+
+mean(ES_L$education_rank) #3.649077
+std.error(ES_L$education_rank) # 0.04569822
+
+
+##MS-ES-G####
+ES_G <- subset(combined_data, message_framing=="es-global")
+nrow(ES_G) #371
+(nrow(subset(ES_G, age=="21"))/nrow(ES_G))*100 #10.78167
+(nrow(subset(ES_G, age=="29.5"))/nrow(ES_G))*100 # 18.0593
+(nrow(subset(ES_G, age=="39.5"))/nrow(ES_G))*100 #18.32884
+(nrow(subset(ES_G, age=="49.5"))/nrow(ES_G))*100 #16.71159
+(nrow(subset(ES_G, age=="59.5"))/nrow(ES_G))*100 #22.37197
+(nrow(subset(ES_G, age=="69.5"))/nrow(ES_G))*100 #12.12938
+(nrow(subset(ES_G, age=="79.5"))/nrow(ES_G))*100 #1.617251
+(nrow(subset(ES_G, age=="89.5"))/nrow(ES_G))*100 #0
+
+(nrow(subset(ES_G, gender=="(1) Female"))/nrow(ES_G))*100 #53.90836
+(nrow(subset(ES_G, gender=="(3) Male"))/nrow(ES_G))*100 #46.09164
+(nrow(subset(ES_G, gender=="(2) Other"))/nrow(ES_G))*100 #0
+
+(nrow(subset(ES_G, ethnicity=="(1) White or Caucasian"))/nrow(ES_G))*100 # 85.71429
+(nrow(subset(ES_G, ethnicity=="(2) Other"))/nrow(ES_G))*100 #14.28571
+
+
+mean(ES_G$age) #46.13073
+std.error(ES_G$age) #0.8256577
+
+mean(ES_G$efficacy) #10.67925
+std.error(ES_G$efficacy) #0.2580507
+
+mean(ES_G$connectedness) #4.771788
+std.error(ES_G$connectedness) #0.05474575
+
+mean(ES_G$experience) #5.034362
+std.error(ES_G$experience) #0.06103318
+
+mean(ES_G$social_norm) #4.597597
+std.error(ES_G$social_norm) #0.06521408
+
+mean(ES_G$social_norm_donation) # 10.53911
+std.error(ES_G$social_norm_donation) #0.7279678
+
+mean(ES_G$climate_scores) #1.606298
+std.error(ES_G$climate_scores) #0.07644157
+
+mean(ES_G$flood) #1.032345
+std.error(ES_G$flood) # 0.164479
+
+mean(ES_G$MD_index) #5.528302
+std.error(ES_G$MD_index) #0.1390068
+
+mean(ES_G$finance_security) #10.48787
+std.error(ES_G$finance_security) #0.2478059
+
+mean(ES_G$education_rank) #3.649077
+std.error(ES_G$education_rank) # 0.05111968
+
+##MS-Nudge####
+nudge<- subset(combined_data, nudge=="present")
+nrow(nudge) #587
+(nrow(subset(nudge, age=="21"))/nrow(nudge))*100 #10.39182
+(nrow(subset(nudge, age=="29.5"))/nrow(nudge))*100 # 21.12436
+(nrow(subset(nudge, age=="39.5"))/nrow(nudge))*100 #18.39864
+(nrow(subset(nudge, age=="49.5"))/nrow(nudge))*100 #15.3322
+(nrow(subset(nudge, age=="59.5"))/nrow(nudge))*100 #23.67973
+(nrow(subset(nudge, age=="69.5"))/nrow(nudge))*100 #9.88075
+(nrow(subset(nudge, age=="79.5"))/nrow(nudge))*100 #1.192504
+(nrow(subset(nudge, age=="89.5"))/nrow(nudge))*100 #0
+
+(nrow(subset(nudge, gender=="(1) Female"))/nrow(nudge))*100 #48.55196
+(nrow(subset(nudge, gender=="(3) Male"))/nrow(nudge))*100 #51.27768
+(nrow(subset(nudge, gender=="(2) Other"))/nrow(nudge))*100 #0.1703578
+
+(nrow(subset(nudge, ethnicity=="(1) White or Caucasian"))/nrow(nudge))*100 # 86.61157
+(nrow(subset(nudge, ethnicity=="(2) Other"))/nrow(nudge))*100 #13.11755
+
+
+mean(nudge$age) #45.17547
+std.error(nudge$age) #0.6433399
+
+mean(nudge$efficacy) #10.41227
+std.error(nudge$efficacy) #0.2046621
+
+mean(nudge$connectedness) #4.82879
+std.error(nudge$connectedness) #0.04192816
+
+mean(nudge$experience) #5.014382
+std.error(nudge$experience) # 0.04892343
+
+mean(nudge$social_norm) #4.478831
+std.error(nudge$social_norm) #0.0520761
+
+mean(nudge$social_norm_donation) # 13.39353
+std.error(nudge$social_norm_donation) #2.060518
+
+mean(nudge$climate_scores) #1.603202
+std.error(nudge$climate_scores) #0.06230578
+
+mean(nudge$flood) #1.189097
+std.error(nudge$flood) # 0.1431211
+
+mean(nudge$MD_index) #5.616695
+std.error(nudge$MD_index) #0.1166016
+
+mean(nudge$finance_security) #10.2517
+std.error(nudge$finance_security) #0.2001269
+
+mean(nudge$education_rank) #3.613288
+std.error(nudge$education_rank) # 0.04010326
+
+
+##MS-No Nudge####
+no_nudge<- subset(combined_data, nudge=="absent")
+nrow(no_nudge) #579
+(nrow(subset(no_nudge, age=="21"))/nrow(no_nudge))*100 #10.53541
+(nrow(subset(no_nudge, age=="29.5"))/nrow(no_nudge))*100 # 16.4076
+(nrow(subset(no_nudge, age=="39.5"))/nrow(no_nudge))*100 #17.61658
+(nrow(subset(no_nudge, age=="49.5"))/nrow(no_nudge))*100 #17.61658
+(nrow(subset(no_nudge, age=="59.5"))/nrow(no_nudge))*100 #26.42487
+(nrow(subset(no_nudge, age=="69.5"))/nrow(no_nudge))*100 #10.53541
+(nrow(subset(no_nudge, age=="79.5"))/nrow(no_nudge))*100 #0.8635579
+(nrow(subset(no_nudge, age=="89.5"))/nrow(no_nudge))*100 #0.1727116
+
+(nrow(subset(no_nudge, gender=="(1) Female"))/nrow(no_nudge))*100 #53.02245
+(nrow(subset(no_nudge, gender=="(3) Male"))/nrow(no_nudge))*100 #46.2867
+(nrow(subset(no_nudge, gender=="(2) Other"))/nrow(no_nudge))*100 #0.6908463
+
+(nrow(subset(no_nudge, ethnicity=="(1) White or Caucasian"))/nrow(no_nudge))*100 #83.5924
+(nrow(subset(no_nudge, ethnicity=="(2) Other"))/nrow(no_nudge))*100 #16.4076
+
+
+mean(no_nudge$age) # 46.53195
+std.error(no_nudge$age) #0.6431882
+
+mean(no_nudge$efficacy) #11.00173
+std.error(no_nudge$efficacy) #0.207685
+
+mean(no_nudge$connectedness) #4.764824
+std.error(no_nudge$connectedness) #0.04520915
+
+mean(no_nudge$experience) #5.006163
+std.error(no_nudge$experience) # 0.05211917
+
+mean(no_nudge$social_norm) #4.764432
+std.error(no_nudge$social_norm) #0.05153471
+
+mean(no_nudge$social_norm_donation) # 20.99138
+std.error(no_nudge$social_norm_donation) #8.714181
+
+mean(no_nudge$climate_scores) #1.667219
+std.error(no_nudge$climate_scores) #0.06617605
+
+mean(no_nudge$flood) #0.9309154
+std.error(no_nudge$flood) # 0.1431211
+
+mean(no_nudge$MD_index) #5.592401
+std.error(no_nudge$MD_index) #0.1079687
+
+mean(no_nudge$finance_security) #10.40803
+std.error(no_nudge$finance_security) #0.2093262
+
+mean(no_nudge$education_rank) #3.542314
+std.error(no_nudge$education_rank) # 0.04147629
+
 
 
 #Other----

@@ -14,18 +14,19 @@ library(corrplot)
 library(ggfortify)
 
 #read in data
-combined_data <- read.csv("Data/combined_data_final.csv")
+combined_data <- read.csv("combined_data_PCA.csv")
 str(combined_data)
 
-#make financial positive for the model
-combined_data$financial = combined_data$financial - min(combined_data$financial)
+#make positive for models
+combined_data$behaviour= combined_data$behaviour - min(combined_data$behaviour)
+combined_data$sympathy= combined_data$sympathy - min(combined_data$sympathy)
+combined_data$climate_scores= combined_data$climate_scores - min(combined_data$climate_scores)
 
 #Behaviour extra mods----
 mod_behaviour_int<- lm(behaviour ~ message_framing*ego +
                          nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
@@ -33,7 +34,7 @@ mod_behaviour_int<- lm(behaviour ~ message_framing*ego +
                          ethnicity +
                          education_rank +
                          experience + 
-                         sqrt(1+climate_change) + 
+                         climate_scores + 
                          flood+
                          MD_index, data = combined_data)
 
@@ -46,7 +47,6 @@ Anova(mod_behaviour_int)
 mod_behaviour_int1<- lm(behaviour ~ message_framing*nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
@@ -55,7 +55,7 @@ mod_behaviour_int1<- lm(behaviour ~ message_framing*nudge +
                           education_rank +
                           experience + 
                           ego + 
-                          sqrt(1+climate_change) + 
+                          climate_scores + 
                           flood +
                           MD_index, data = combined_data)
 autoplot(mod_behaviour_int1) #ok
@@ -68,7 +68,6 @@ mod_behaviour_int2<- lm(behaviour ~ message_framing*experience +
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
@@ -76,7 +75,7 @@ mod_behaviour_int2<- lm(behaviour ~ message_framing*experience +
                           ethnicity +
                           education_rank +
                           ego + 
-                          sqrt(1+climate_change) + 
+                          climate_scores + 
                           flood +
                           MD_index, data = combined_data)
 
@@ -86,11 +85,10 @@ Anova(mod_behaviour_int2)
 
 #Don't use - message framing * experience not significant
 
-mod_behaviour_int3<- lm(behaviour ~ message_framing*sqrt(1+ climate_change) +
+mod_behaviour_int3<- lm(behaviour ~ message_framing*climate_scores +
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
@@ -112,17 +110,16 @@ mod_behaviour_int4<- lm(behaviour ~ message_framing*flood +
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
                           gender +
                           ethnicity +
-                          sqrt(1+ climate_change) +
+                          climate_scores +
                           education_rank +
                           ego + 
                           experience + 
-                          MD_index, data = join_quant_survey_data)
+                          MD_index, data =combined_data)
 
 autoplot(mod_behaviour_int4) #ok
 summary(mod_behaviour_int4)
@@ -132,7 +129,6 @@ mod_behaviour_int5<- lm(behaviour ~ message_framing*MD_index +
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           social_norm +
                           finance_security + 
                           age +
@@ -141,7 +137,7 @@ mod_behaviour_int5<- lm(behaviour ~ message_framing*MD_index +
                           education_rank +
                           experience + 
                           ego + 
-                          sqrt(1+climate_change) + 
+                          climate_scores + 
                           flood, data = combined_data)
 
 autoplot(mod_behaviour_int5) #ok
@@ -152,11 +148,10 @@ Anova(mod_behaviour_int5)
 
 #Sympathy models ----
 
-mod_sympathy_int<- lm(sympathy^(2) ~ message_framing*ego +
+mod_sympathy_int<- lm(sympathy ~ message_framing*ego +
                         nudge + 
                         efficacy + 
                         connectedness + 
-                        allocated_wild_300 +
                         social_norm +
                         finance_security + 
                         age +
@@ -164,16 +159,19 @@ mod_sympathy_int<- lm(sympathy^(2) ~ message_framing*ego +
                         ethnicity +
                         education_rank +
                         experience + 
-                        sqrt(1+climate_change) + 
+                        climate_scores + 
                         flood +
                         MD_index, data = combined_data)
 
+autoplot(mod_sympathy_int)
+summary(mod_sympathy_int)
+Anova(mod_sympathy_int)
+
 #Don't use - message framing * ego not significant
 
-mod_sympathy_int1<- lm(log(1+sympathy)~ message_framing*nudge + 
+mod_sympathy_int1<- lm(sympathy ~ message_framing*nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
@@ -182,18 +180,21 @@ mod_sympathy_int1<- lm(log(1+sympathy)~ message_framing*nudge +
                          education_rank +
                          experience + 
                          ego + 
-                         sqrt(1+climate_change) + 
+                         climate_scores + 
                          flood +
                          MD_index, data = combined_data)
+
+autoplot(mod_sympathy_int1)
+summary(mod_sympathy_int1)
+Anova(mod_sympathy_int1)
 
 #Don't use - message framing * nudge not significant
 
 
-mod_sympathy_int2<- lm(log(1+sympathy) ~ message_framing*experience+
+mod_sympathy_int2<- lm(sympathy ~ message_framing*experience+
                          nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
@@ -201,27 +202,34 @@ mod_sympathy_int2<- lm(log(1+sympathy) ~ message_framing*experience+
                          ethnicity +
                          education_rank +
                          ego + 
-                         sqrt(1+ climate_change) + 
+                         climate_scores + 
                          flood +
                          MD_index, data = combined_data)
 
+autoplot(mod_sympathy_int2)
+summary(mod_sympathy_int2)
+Anova(mod_sympathy_int2)
+
 #Don't use - message framing * experience not significant
 
-mod_sympathy_int4<- lm(log(1+sympathy) ~ message_framing*flood +
+mod_sympathy_int4<- lm(sympathy ~ message_framing*flood +
                          nudge + 
                          efficacy + 
                          connectedness + 
-                         allocated_wild_300 +
                          social_norm +
                          finance_security + 
                          age +
                          gender +
                          ethnicity +
                          education_rank +
-                         sqrt(1+climate_change)+
+                         climate_scores+
                          experience +
                          ego +
                          MD_index, data = combined_data)
+
+autoplot(mod_sympathy_int4)
+summary(mod_sympathy_int4)
+Anova(mod_sympathy_int4)
 
 #Don't use - message framing * flood not significant
 
@@ -231,7 +239,6 @@ mod_financial_int<- glm(financial ~ message_framing*ego+
                           nudge + 
                           efficacy + 
                           connectedness + 
-                          allocated_wild_300 +
                           log(1 + social_norm_donation) +
                           finance_security + 
                           age +
@@ -239,7 +246,7 @@ mod_financial_int<- glm(financial ~ message_framing*ego+
                           ethnicity +
                           education_rank +
                           experience + 
-                          sqrt(1+ climate_change) + 
+                          climate_scores + 
                           flood+
                           MD_index, data = combined_data, family = quasipoisson)
 par(mfrow=c(2,2))
@@ -252,7 +259,6 @@ Anova(mod_financial_int, test = "F")
 mod_financial_int1<- glm(financial ~ message_framing*nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            log(1 + social_norm_donation) +
                            finance_security + 
                            age +
@@ -261,12 +267,13 @@ mod_financial_int1<- glm(financial ~ message_framing*nudge +
                            education_rank +
                            experience + 
                            ego + 
-                           sqrt(1+ climate_change) + 
+                           climate_scores + 
                            flood+
                            MD_index, data = combined_data, family = quasipoisson)
 par(mfrow=c(2,2))
 plot(mod_financial_int1)
 summary(mod_financial_int1)
+Anova(mod_financial_int1, test = "F")
 
 #Don't use - message framing * nudge not significant
 
@@ -274,8 +281,7 @@ mod_financial_int2<- glm(financial ~ message_framing*experience +
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           sqrt(1+ climate_change)+
-                           allocated_wild_300 +
+                           climate_scores+
                            log(1 + social_norm_donation) +
                            finance_security + 
                            age +
@@ -292,11 +298,10 @@ Anova(mod_financial_int2, test = "F")
 
 #Don't use - message framing * experience not significant
 
-mod_financial_int3<- glm(financial ~ message_framing*sqrt(1+climate_change) +
+mod_financial_int3<- glm(financial ~ message_framing*climate_scores +
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            log(1 + social_norm_donation) +
                            finance_security + 
                            age +
@@ -318,13 +323,12 @@ mod_financial_int4<- glm(financial ~ message_framing*flood +
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            log(1 + social_norm_donation) +
                            finance_security + 
                            age +
                            gender +
                            ethnicity +
-                           sqrt(1+ climate_change) +
+                           climate_scores +
                            education_rank +
                            experience + 
                            ego +
@@ -340,7 +344,6 @@ Anova(mod_financial_int4, test = "F")
 mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            finance_security + 
                            age +
                            gender +
@@ -348,7 +351,7 @@ mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge +
                            education_rank +
                            experience + 
                            ego + 
-                           sqrt(1+ climate_change) + 
+                           climate_scores + 
                            flood +
                            MD_index, data = combined_data)
 autoplot(mod_sufficieny_int1)
@@ -361,26 +364,25 @@ mod_sufficieny_int2<- lm(sufficiency ~ message_framing*experience+
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            finance_security + 
                            age +
                            gender +
                            ethnicity +
                            education_rank +
                            ego + 
-                           sqrt(1+ climate_change) + 
+                           climate_scores + 
                            flood +
                            MD_index, data = combined_data)
 autoplot(mod_sufficieny_int2)
-summary(mod_sufficieny_int2)#Anova(mod_sufficieny_int2)
+summary(mod_sufficieny_int2)
+Anova(mod_sufficieny_int2)
 
 #Don't use - message framing * experience not significant
 
-mod_sufficieny_int3<- lm(sufficiency ~ message_framing*sqrt(1+climate_change)+
+mod_sufficieny_int3<- lm(sufficiency ~ message_framing*climate_scores+
                            nudge + 
                            efficacy + 
                            connectedness + 
-                           allocated_wild_300 +
                            finance_security + 
                            age +
                            gender +
@@ -395,5 +397,4 @@ summary(mod_sufficieny_int3)
 Anova(mod_sufficieny_int3)
 
 #Don't use - message framing * climate change not significant
-
 
