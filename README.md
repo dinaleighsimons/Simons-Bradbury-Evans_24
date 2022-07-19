@@ -1,4 +1,4 @@
-# STRATEGIC CONSERVATION MARKETING: IMPACTS OF SELF-EFFICACY, ECOSYSTEM SERVICE MESSAGE FRAMING AND DYNAMIC SOCIAL NORMS ON PUBLIC SUPPORT FOR TROPICAL FOREST RESTORATION
+#Strategic conservation marketing: Impacts of self-efficacy, ecosystem service message framing and dynamic social norms on public support for tropical forest restoration
 
 **Simons D-L, Bradbury RB & Evans KL**
  
@@ -8,9 +8,8 @@ This document contains data, scripts and figures for the manuscript for Simons, 
 
 **Important Files**
 
-Dataset: combined_data_final.csv
+Dataset: combined_data_PCA.csv
 
 Main script: Simons_22.R
 
-Extra models: Simons_22_extramods.R
-
+Extra models with non-sig interactions: Simons_22_extramods.R
