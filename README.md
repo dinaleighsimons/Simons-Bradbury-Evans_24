@@ -4,7 +4,7 @@
  
 **Overview**
 
-This document contains data, scripts and figures for the manuscript for Simons, Bradbury and Evans (in-prep). 
+This document contains data, scripts and figures for the manuscript for Simons, Bradbury and Evans (in-prep). Please open the R project when running scripts to prevent reproducibility issues.
 
 **Important Files**
 
