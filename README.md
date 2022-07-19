@@ -1,4 +1,4 @@
-#Strategic conservation marketing: Impacts of self-efficacy, ecosystem service message framing and dynamic social norms on public support for tropical forest restoration
+# Strategic conservation marketing: Impacts of self-efficacy, ecosystem service message framing and dynamic social norms on public support for tropical forest restoration
 
 **Simons D-L, Bradbury RB & Evans KL**
  
