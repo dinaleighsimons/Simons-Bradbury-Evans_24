@@ -4,7 +4,7 @@
  
 **Overview**
 
-This document contains data, scripts and figures for the manuscript for Simons, Bradbury and Evans (in-prep). Please open the R project when running scripts to prevent reproducibility issues. Run Simons_22_packages.R to install required R packages before running the main script Simons_22.R. 
+This document contains data, scripts and figures for the manuscript for Simons, Bradbury and Evans (in-prep). Please open the R project when running scripts to prevent reproducibility issues. If reproducibility issues occur, run Simons_22_packages.R to install required R packages before running the main script Simons_22.R. 
 
 **Important Files**
 
