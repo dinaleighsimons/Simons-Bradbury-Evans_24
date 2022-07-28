@@ -631,6 +631,7 @@ ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
 #warnings ok - removed extreme values to make visualization easier
 
 
+
 ##Correlation matrix plot----
 
 #remove all non-numeric variables
@@ -640,20 +641,20 @@ ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
 #cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
 
 #colnames(cor_data) <- c("Flood experience",
-                        "Social norm 'donation'",
-                        "Adversity awareness", 
-                        "Nature connection",
-                        "Financial support", 
-                        "Advert sufficiency", 
-                        "Social norm 'support'", 
-                        "Sympathetic attitudes",
-                        "Behavioural support", 
-                        "Self-efficacy", 
-                        "Climate change", 
-                        "Egoistical attitudes", 
-                        "Education", 
-                        "Financial security", 
-                        "Index of Multiple Deprivation")
+                        #"Social norm 'donation'",
+                        #"Adversity awareness", 
+                        #"Nature connection",
+                        #"Financial support", 
+                        #"Advert sufficiency", 
+                        #"Social norm 'support'", 
+                        #"Sympathetic attitudes",
+                        #"Behavioural support", 
+                        #"Self-efficacy", 
+                        #"Climate change", 
+                        #"Egoistical attitudes", 
+                        #"Education", 
+                        #"Financial security", 
+                        #"Index of Multiple Deprivation")
 
 #compute a correlation matrix
 #res<- cor(cor_data, method = "pearson", use = "complete.obs")
