@@ -544,7 +544,7 @@ nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
   scale_y_continuous(limits=c(0,6.5))+
   guides(color=guide_legend("Message framing"), fill = "none")
 
-nature_fin
+suppressWarnings(print(nature_fin))
 
 #warnings ok - limited axis to not present extreme values to improve visualization
 
@@ -560,7 +560,7 @@ efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
   scale_y_continuous(limits=c(0,6.5))+
   guides(color=guide_legend("Message framing"), fill = "none")
 
-efficacy_fin
+suppressWarnings(print(efficacy_fin))
 
 #warnings ok - limited axis to not present extreme values to improve visualization
 
@@ -578,7 +578,7 @@ social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financi
   scale_x_continuous(limits=c(0, 7))+
   guides(color=guide_legend("Message framing"), fill = "none")
 
-social_fin
+suppressWarnings(print(social_fin))
 
 #warnings ok - limited axis to not present extreme values to improve visualization
 
@@ -616,14 +616,14 @@ social_behav <- ggplot(combined_data, aes(x=social_norm, y=behaviour))+
 
 social_behav
 
-scatter_plot <- ggarrange(nature_symp, efficacy_symp, social_symp,
+scatter_plot <- suppressWarnings(ggarrange(nature_symp, efficacy_symp, social_symp,
                           nature_fin, efficacy_fin, social_fin,
                           nature_behav, efficacy_behav, social_behav,
                           labels = c("a", "b", "c", "d", "e", "f", "g", "h", "i"), #spacing needed for correct alignment
                           ncol = 3, nrow = 3,
-                          align = 'hv')
+                          align = 'hv'))
 
-scatter_plot
+suppressWarnings(print(scatter_plot))
 ##warnings ok - limited axis to not present extreme values to improve visualization
 
 ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
@@ -1052,29 +1052,28 @@ mean(no_nudge$education_rank) #3.542314
 std.error(no_nudge$education_rank) # 0.04147629
 
 
-
 #Other----
 
 ##Exploring using survey package
 
-combined_data<- mutate(combined_data,
-                       fpc=0)
+#combined_data<- mutate(combined_data,
+                       #fpc=0)
 
-combined_data$fpc[combined_data$letter == "A"] <- sum(with(combined_data, letter=="A"))
-combined_data$fpc[combined_data$letter == "B"] <- sum(with(combined_data, letter=="B"))
-combined_data$fpc[combined_data$letter == "C"] <- sum(with(combined_data, letter=="C"))
-combined_data$fpc[combined_data$letter == "D"] <- sum(with(combined_data, letter=="D"))
-combined_data$fpc[combined_data$letter == "E"] <- sum(with(combined_data, letter=="E"))
-combined_data$fpc[combined_data$letter == "F"] <- sum(with(combined_data, letter=="F"))
+#combined_data$fpc[combined_data$letter == "A"] <- sum(with(combined_data, letter=="A"))
+#combined_data$fpc[combined_data$letter == "B"] <- sum(with(combined_data, letter=="B"))
+#combined_data$fpc[combined_data$letter == "C"] <- sum(with(combined_data, letter=="C"))
+#combined_data$fpc[combined_data$letter == "D"] <- sum(with(combined_data, letter=="D"))
+#combined_data$fpc[combined_data$letter == "E"] <- sum(with(combined_data, letter=="E"))
+#combined_data$fpc[combined_data$letter == "F"] <- sum(with(combined_data, letter=="F"))
 
-dstrat <- svydesign(id=~1,strata=~letter,  data=combined_data)
-summary(dstrat)
+#dstrat <- svydesign(id=~1,strata=~letter,  data=combined_data, weight = 1)
+#summary(dstrat)
 
-svymean(~sympathy+behaviour+sufficiency+financial, dstrat)
-svyquantile(~sympathy+behaviour+sufficiency+financial, dstrat, quantile=c(0.25,0.5,0.75), ci=TRUE)
+#svymean(~sympathy+behaviour+sufficiency+financial, dstrat)
+#svyquantile(~sympathy+behaviour+sufficiency+financial, dstrat, quantile=c(0.25,0.5,0.75), ci=TRUE)
 
-svytotal(~message_framing, dstrat)
-svytotal(~nudge, dstrat)
-svytotal(~letter, dstrat)
+#svytotal(~message_framing, dstrat)
+#svytotal(~nudge, dstrat)
+#svytotal(~letter, dstrat)
 
-svyby(~sympathy+behaviour+financial+sufficiency, ~message_framing, design=dstrat, svymean)
+#svyby(~sympathy+behaviour+financial+sufficiency, ~message_framing, design=dstrat, svymean)
