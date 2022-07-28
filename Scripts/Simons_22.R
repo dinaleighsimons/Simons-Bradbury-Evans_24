@@ -1,4 +1,4 @@
-#Simons, Evans and Bradbury main script
+#Simons, Bradbury and Evans (2022) main script
 
 #Setting environment----
 rm(list = ls())
@@ -182,7 +182,8 @@ nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Financial support")+
   #ylim(0.95,1.26)+
-  scale_y_continuous(breaks = seq(0, 1.29, by=0.05), limits=c(0.95,1.29))+
+  scale_y_continuous(breaks = seq(0, 1.27, by=0.05), limits=c(0.95,1.27),
+                     sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 93, by=3.5)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -210,7 +211,8 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Advert sufficiency")+
  #ylim(11.3,13)+
-  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13),
+                     sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -237,16 +239,11 @@ nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.23,6.5))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.23,6.5),
+                     sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Absent","Present"))
 
 nsym
-
-max(combined_data$sympathy)
-min(combined_data$sympathy)
-
-max(combined_data$behaviour)
-min(combined_data$behaviour)
 
 
 nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
@@ -263,7 +260,8 @@ nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.4,3.9))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.08), limits=c(3.4,3.9),
+                     sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.3)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -280,7 +278,7 @@ nudge_plot <- ggarrange(ns, nsym, nf, nb,
                         ncol = 2, nrow = 2,
                         align = 'v')
 nudge_plot
-ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 6)
+ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 8)
 
 
 ##Mean and SE summary for message framing----
@@ -353,9 +351,10 @@ mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_fr
   theme_classic()+
   theme(text = element_text(size = 13),
         legend.position = "none")+
-  xlab("Message framing") + ylab("Financial support")+
+  xlab(" \n Message framing") + ylab("Financial support")+
   #ylim(0.95,1.26)+
-  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
+  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26),
+                     sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 1100, by=3.50)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mf
@@ -374,9 +373,10 @@ ms <- ggplot(message.sufficiency, aes(x=message_framing, y=mean, colour = messag
         legend.position = "none",
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
-  xlab("Nudge") + ylab("Advert sufficiency")+
+  xlab(" \n Message framing") + ylab("Advert sufficiency")+
   #ylim(11.3,13)+
-  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13),
+                     sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 ms
 
@@ -395,9 +395,10 @@ msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message
         legend.position = "none",
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
-  xlab("Message framing") + ylab("Sympathetic attitudes")+
+  xlab(" \n Message framing") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5),
+                     sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 msym
@@ -414,9 +415,10 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
   theme_classic()+
   theme(text = element_text(size = 13),
         legend.position = "none")+
-  xlab("Message framing") + ylab("Behavioural support")+
+  xlab(" \n Message framing") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8),
+                     sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mb
@@ -426,68 +428,205 @@ message_plot <- ggarrange(ms, msym, mf, mb,
                           ncol = 2, nrow = 2,
                           align = 'v')
 message_plot
-ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =7)
+ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =9)
 
 ##Scatter plots----
 
-climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
-  geom_point(size=0.5) +
-  geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
-  theme_classic() +
-  labs(x = "Climate change scepticism", y = "Sympathetic attitudes (transformed)")+
-  theme(text = element_text(size = 10)) +
+combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
+
+###Climate plot----
+#climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
+  #geom_point(size=0.5) +
+  #geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
+  #theme_classic() +
+  #labs(x = "Climate change scepticism", y = "Sympathetic attitudes (transformed)")+
+  #theme(text = element_text(size = 10)) +
+  #guides(color=guide_legend("Message framing"), fill = "none")
+
+#climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
+                                                #labels = c("Biodiversity", "ES-global", "ES-local"))
+#climateplot
+
+#ggsave(path = "Figures", filename = "sc_plot.png", width = 8, height = 5)
+
+
+###Sufficiency plots ----
+#nature_suff<- ggplot(combined_data, aes(x=connectedness, y=sufficiency))+
+  #geom_point(alpha=0.2)+
+  #geom_smooth(method = "lm", se=T)+
+  #theme_classic()+
+  #labs(x = "Nature connection", y = "Advert sufficiency")+
+  #theme(text = element_text(size = 15),
+        #axis.title.x = element_blank(),
+        #axis.text.x = element_blank(),
+        #legend.position = "none")+
+  #guides(color=guide_legend("Message framing"), fill = "none")
+
+#nature_suff
+
+#efficacy_suff<- ggplot(combined_data, aes(x=efficacy, y=sufficiency))+
+  #geom_point(alpha=0.2)+
+  #geom_smooth(method = "lm", se=T)+
+  #theme_classic()+
+  #labs(x = "Self-efficacy", y = "Advert sufficiency")+
+  #theme(text = element_text(size = 15),
+        #axis.title.y = element_blank(),
+        #axis.text.y = element_blank(),
+        #axis.title.x = element_blank(),
+        #legend.position = "none")+
+  #guides(color=guide_legend("Message framing"), fill = "none")
+
+#efficacy_suff
+
+#social_suff <- ggplot(combined_data, aes(x=social_norm, y=sufficiency))+
+  #geom_point(alpha=0.2)+
+  #geom_smooth(method = "lm", se=T)+
+  #theme_classic()+
+  #labs(x = "Social norm", y = "Advert sufficiency")+
+  #theme(text = element_text(size = 15),
+        #axis.title.y = element_blank(),
+        #axis.text.y = element_blank(),
+        #axis.title.x = element_blank(),
+        #legend.position = "none")+
+  #guides(color=guide_legend("Message framing"), fill = "none")
+
+#social_suff
+
+###Sympathetic plots----
+
+nature_symp<- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Nature connection", y = "Sympathetic attitudes")+
+  theme(text = element_text(size = 15),
+        legend.position = "none")+
   guides(color=guide_legend("Message framing"), fill = "none")
 
-climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
-                                                labels = c("Biodiversity", "ES-global", "ES-local"))
-climateplot
-
-ggsave(path = "Figures", filename = "sc_plot.png", width = 8, height = 5)
-
-#natureplot<- ggplot(combined_data, aes(x=connectedness, y=sympathy^2, colour=message_framing))+
-  #geom_point(alpha=0.2)+
-  #geom_smooth(method = "lm", se=F)+
-  #theme_classic()+
-  #labs(x = "Nature connectedness", y = expression(paste("Sympathetic attitudes"^2)))+
-  #theme(text = element_text(size = 15),
-        #axis.title.y = element_blank(),
-        #axis.text.y = element_blank(),
-        #legend.position = "none")+
-  #guides(color=guide_legend("Message framing"), fill = "none")
-
-#natureplot<- natureplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
+#naturesymp<- naturesymp + scale_colour_manual(values = c("black", "sky blue", "grey70"),
                                               #labels = c("Biodiversity", "ES-global", "ES-local"))
-#natureplot
+nature_symp
 
-#egoplot<- ggplot(combined_data, aes(x=ego, y=sympathy^2, colour=message_framing))+
-  #geom_point(alpha=0.2)+
-  #geom_smooth(method = "lm", se=F)+
-  #theme_classic()+
-  #labs(x = "Egoistical attitudes", y = expression(paste("Sympathetic attitudes"^2)))+
-  #theme(text = element_text(size = 15),
-        #axis.title.y = element_blank(),
-        #axis.text.y = element_blank(),
-        #legend.position = "none")+
-  #guides(color=guide_legend("Message framing"), fill = "none")
+efficacy_symp<- ggplot(combined_data, aes(x=efficacy, y=sympathy))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Self-efficacy", y = "Sympathetic attitudes")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank(),
+        legend.position = "none")+
+  guides(color=guide_legend("Message framing"), fill = "none")
 
-#egoplot<- egoplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
-                                        #labels = c("Biodiversity", "ES-global", "ES-local"))
-#egoplot
+efficacy_symp
 
-#scatter_plot <- ggarrange(climateplot, natureplot, egoplot,
-                          #labels = c("a", "b", "c"),
-                          #ncol = 3, nrow = 1,
-                          #align = 'h')
-#scatter_plot
-#ggsave("interaction_plot.png", scatter_plot, height =5, width =25)
+social_symp <- ggplot(combined_data, aes(x=social_norm, y=sympathy))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Social norm", y = "Sympathetic attitudes")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank(),
+        legend.position = "none")+
+  guides(color=guide_legend("Message framing"), fill = "none")
 
+social_symp
 
+###Financial plots----
+
+nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "glm", se=T,
+              method.args = list(family = "quasipoisson"))+
+  theme_classic()+
+  labs(x = "Nature connection", y = "Financial support")+
+  theme(text = element_text(size = 15),
+        legend.position = "none")+
+  scale_y_continuous(limits=c(0,6.5))+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+nature_fin
+
+efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "glm", se=T,
+              method.args = list(family = "quasipoisson"))+
+  theme_classic()+
+  labs(x = "Self-efficacy", y = "Finanical support")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank(),
+        legend.position = "none")+
+  scale_y_continuous(limits=c(0,6.5))+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+efficacy_fin
+
+social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financial))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "glm", se=T,
+              method.args = list(family = "quasipoisson"))+
+  theme_classic()+
+  labs(x = "Social norm donation (transformed) ", y = "Finanical support")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank(),
+        legend.position = "none")+
+  scale_y_continuous(limits=c(0,9),
+                     breaks = seq(0, 9, by=2))+
+  scale_x_continuous(limits=c(0, 7))+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+social_fin
+
+###Behaviour plots----
+
+nature_behav<- ggplot(combined_data, aes(x=connectedness, y=behaviour))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Nature connection", y = "Behavioural support")+
+  theme(text = element_text(size = 15))+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+nature_behav
+
+efficacy_behav<- ggplot(combined_data, aes(x=efficacy, y=behaviour))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Self-efficacy", y = "Behavioural support")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank())+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+efficacy_behav
+
+social_behav <- ggplot(combined_data, aes(x=social_norm, y=behaviour))+
+  geom_point(alpha=0.2)+
+  geom_smooth(method = "lm", se=T)+
+  theme_classic()+
+  labs(x = "Social norm", y = "Behavioural support")+
+  theme(text = element_text(size = 15),
+        axis.title.y = element_blank())+
+  guides(color=guide_legend("Message framing"), fill = "none")
+
+social_behav
+
+scatter_plot <- ggarrange(nature_symp, efficacy_symp, social_symp,
+                          nature_fin, efficacy_fin, social_fin,
+                          nature_behav, efficacy_behav, social_behav,
+                          labels = c("a", "b", "c", "d", "e", "f", "g", "h", "i"), #spacing needed for correct alignment
+                          ncol = 3, nrow = 3,
+                          align = 'hv')
+
+scatter_plot
+ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
+
+#warnings ok - removed extreme values to make visualization easier
 
 
 ##Correlation matrix plot----
 
 #remove all non-numeric variables
-cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores, fpc))
+cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores))
 cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
 #NAs <- cor_data[is.na(cor_data$MD_index),]
 cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
@@ -526,10 +665,13 @@ dev.off()
 cor_plot<- corrplot(res, type = "full", order = "hclust", 
          tl.col = "black", tl.srt = 45)
 
+#expoted manually
+
 
 ##Model summary plots----
 library(jtools)
 library(ggstance)
+library(broom.mixed)
 
 
 plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympathy_int3, scale = TRUE)
@@ -556,6 +698,38 @@ nrow(combined_data) #1116
 (nrow(subset(combined_data, ethnicity=="(1) White or Caucasian"))/nrow(combined_data))*100 #85.24871
 (nrow(subset(combined_data, ethnicity=="(2) Other"))/nrow(combined_data))*100 #14.75129
 
+###Offsetting means to match original scales----
+
+#Behavioral
+max(combined_data$behaviour) #7.202505
+mean(combined_data$behaviour) #3.635307
+7.202505/2 #3.601253
+
+20/7.202505 #2.776812
+3.601253*2.776812 #10
+2.776812*3.635307
+
+#Financial
+max(combined_data$financial)#15.11219
+mean(combined_data$financial) #1.091872
+#max in £ is £1100 (donation + allocation_100)
+
+1100/15.11219 #72.78892
+72.78892*1.091872 #79.47618
+
+#Sympathy
+max(combined_data$sympathy) #7.86907
+mean(combined_data$sympathy) #6.353343
+
+20/7.86907
+2.541596*6.353343 #16.14763
+2.541596*3.9 #9.912224
+
+###One-sampled t-tests to measure overall support----
+t.test(combined_data$sufficiency, mu = 10)
+t.test(combined_data$behaviour, mu = 7.202505/2)
+t.test(combined_data$sympathy, mu = 7.86907/2)
+
 library(plotrix)
 mean(combined_data$age) #45.84906
 std.error(combined_data$age) #0.4551066
@@ -573,7 +747,6 @@ max(combined_data$experience) #7.27827
 mean(combined_data$experience) #5.010301
 std.error(combined_data$experience) #0.03571201
 
-combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
 min(combined_data$social_norm) #0
 max(combined_data$social_norm) #  7.016525
 
