@@ -1,4 +1,4 @@
-#Simons, Evans and Bradbury script extra script
+#Simons, Bradbury, and Evans (2022) extra script
 
 #Setting environment####
 rm(list = ls())
@@ -14,7 +14,7 @@ library(corrplot)
 library(ggfortify)
 
 #read in data
-combined_data <- read.csv("combined_data_PCA.csv")
+combined_data <- read.csv("Data/combined_data_PCA.csv")
 str(combined_data)
 
 #make positive for models
@@ -146,7 +146,29 @@ Anova(mod_behaviour_int5)
 
 #Don't use - message framing * MD_index not significant
 
-#Sympathy models ----
+mod_behaviour_int6<- lm(behaviour ~ nudge*social_norm+
+                          message_framing+
+                          MD_index +
+                          efficacy + 
+                          connectedness + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores + 
+                          flood, data = combined_data)
+
+autoplot(mod_behaviour_int6) #ok
+summary(mod_behaviour_int6)
+Anova(mod_behaviour_int6)
+
+#Don't use - nudge*social_norm not significant
+
+
+#Sympathy extra models ----
 
 mod_sympathy_int<- lm(sympathy ~ message_framing*ego +
                         nudge + 
@@ -233,7 +255,29 @@ Anova(mod_sympathy_int4)
 
 #Don't use - message framing * flood not significant
 
-##Financial models----
+mod_sympathy_int5<- lm(sympathy ~ nudge*social_norm +
+                         message_framing + 
+                         flood +
+                         efficacy + 
+                         connectedness + 
+                         finance_security + 
+                         age +
+                         gender +
+                         ethnicity +
+                         education_rank +
+                         climate_scores+
+                         experience +
+                         ego +
+                         MD_index, data = combined_data)
+
+autoplot(mod_sympathy_int5)
+summary(mod_sympathy_int5)
+Anova(mod_sympathy_int5)
+
+#Don't use - nudge*social_norm not significant
+
+
+#Financial extra models----
 
 mod_financial_int<- glm(financial ~ message_framing*ego+
                           nudge + 
@@ -338,8 +382,30 @@ plot(mod_financial_int4)
 summary(mod_financial_int4)
 Anova(mod_financial_int4, test = "F")
 
-
 #Don't use - message framing * flood not significant
+
+mod_financial_int5<- glm(financial ~  nudge*log(1 + social_norm_donation) +
+                           message_framing + 
+                           flood +
+                           efficacy + 
+                           connectedness +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           climate_scores +
+                           education_rank +
+                           experience + 
+                           ego +
+                           MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int5)
+summary(mod_financial_int5)
+Anova(mod_financial_int5, test = "F")
+
+#Don't use - nudge*social_norm not significant
+
+#Sufficiency extra models----
 
 mod_sufficieny_int1<- lm(sufficiency ~ message_framing*nudge + 
                            efficacy + 
@@ -397,4 +463,3 @@ summary(mod_sufficieny_int3)
 Anova(mod_sufficieny_int3)
 
 #Don't use - message framing * climate change not significant
-
