@@ -634,12 +634,12 @@ ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
 ##Correlation matrix plot----
 
 #remove all non-numeric variables
-cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores))
-cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
+#cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores))
+#cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
 #NAs <- cor_data[is.na(cor_data$MD_index),]
-cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
+#cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
 
-colnames(cor_data) <- c("Flood experience",
+#colnames(cor_data) <- c("Flood experience",
                         "Social norm 'donation'",
                         "Adversity awareness", 
                         "Nature connection",
@@ -656,22 +656,22 @@ colnames(cor_data) <- c("Flood experience",
                         "Index of Multiple Deprivation")
 
 #compute a correlation matrix
-res<- cor(cor_data, method = "pearson", use = "complete.obs")
-res
+#res<- cor(cor_data, method = "pearson", use = "complete.obs")
+#res
 
 #get p values
-res2<- rcorr(as.matrix(cor_data), type = "pearson")
-res2
+#res2<- rcorr(as.matrix(cor_data), type = "pearson")
+#res2
 
-res2$r
-res2$P
+#res2$r
+#res2$P
 
 #plot
-plot.new()
-dev.off()
+#plot.new()
+#dev.off()
 
-cor_plot<- corrplot(res, type = "full", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
+#cor_plot<- corrplot(res, type = "full", order = "hclust", 
+         #tl.col = "black", tl.srt = 45)
 
 #exported manually
 
