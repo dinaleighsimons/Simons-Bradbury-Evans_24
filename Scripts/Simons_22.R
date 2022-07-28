@@ -546,6 +546,8 @@ nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
 
 nature_fin
 
+#warnings ok - limited axis to not present extreme values to improve visualization
+
 efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
@@ -559,6 +561,8 @@ efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
   guides(color=guide_legend("Message framing"), fill = "none")
 
 efficacy_fin
+
+#warnings ok - limited axis to not present extreme values to improve visualization
 
 social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financial))+
   geom_point(alpha=0.2)+
@@ -575,6 +579,8 @@ social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financi
   guides(color=guide_legend("Message framing"), fill = "none")
 
 social_fin
+
+#warnings ok - limited axis to not present extreme values to improve visualization
 
 ###Behaviour plots----
 
@@ -618,6 +624,8 @@ scatter_plot <- ggarrange(nature_symp, efficacy_symp, social_symp,
                           align = 'hv')
 
 scatter_plot
+##warnings ok - limited axis to not present extreme values to improve visualization
+
 ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
 
 #warnings ok - removed extreme values to make visualization easier
@@ -665,7 +673,7 @@ dev.off()
 cor_plot<- corrplot(res, type = "full", order = "hclust", 
          tl.col = "black", tl.srt = 45)
 
-#expoted manually
+#exported manually
 
 
 ##Model summary plots----
@@ -674,10 +682,10 @@ library(ggstance)
 library(broom.mixed)
 
 
-plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympathy_int3, scale = TRUE)
+#plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympathy_int3, scale = TRUE)
 
-plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main, scale = TRUE, 
-           model.names = c("Behaviour", "Sufficency", "Finance"))
+#plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main, scale = TRUE, 
+           #model.names = c("Behaviour", "Sufficency", "Finance"))
 
 #Demographics####
 ##Total####
