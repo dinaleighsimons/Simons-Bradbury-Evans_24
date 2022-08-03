@@ -13,14 +13,21 @@ library(Hmisc)
 library(corrplot)
 library(ggfortify)
 
-#read in data
-combined_data <- read.csv("Data/combined_data_PCA.csv")
+#read in data and format dataset
+combined_data <- read.csv("Data/combined_data_PCA_new.csv")
 str(combined_data)
+
+combined_data <- combined_data %>% select(-c("X.1", "X"))
+combined_data<- rename(combined_data, meanflood = newflood)
+combined_data$message_framing = as.factor(combined_data$message_framing)
+combined_data$nudge = as.factor(combined_data$nudge)
 
 #make positive for models
 combined_data$behaviour= combined_data$behaviour - min(combined_data$behaviour)
 combined_data$sympathy= combined_data$sympathy - min(combined_data$sympathy)
 combined_data$climate_scores= combined_data$climate_scores - min(combined_data$climate_scores)
+combined_data$experience= combined_data$experience - min(combined_data$experience)
+combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
 
 #Models####
 
@@ -39,7 +46,7 @@ mod_behaviour_main<- lm(behaviour ~ message_framing +
                           experience + 
                           ego + 
                           climate_scores+ 
-                          flood+
+                          meanflood+
                           MD_index, data = combined_data)
 autoplot(mod_behaviour_main) #ok
 summary(mod_behaviour_main)
@@ -60,7 +67,7 @@ mod_sympathy_main<- lm(sympathy ~ message_framing+
                          experience + 
                          ego + 
                          climate_scores + 
-                         flood +
+                         meanflood +
                          MD_index, data = combined_data)
 autoplot(mod_sympathy_main)
 summary(mod_sympathy_main)
@@ -78,7 +85,7 @@ mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
                          education_rank +
                          experience +
                          ego + 
-                         flood +
+                         meanflood +
                          MD_index, data = combined_data)
 autoplot(mod_sympathy_int3)
 summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
@@ -101,7 +108,7 @@ mod_financial_main<- glm(financial ~ message_framing+
                            experience + 
                            ego + 
                            climate_scores + 
-                           flood+
+                           meanflood+
                            MD_index, data = combined_data, family = quasipoisson)
 par(mfrow=c(2,2))
 plot(mod_financial_main)
@@ -129,7 +136,7 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            experience + 
                            ego + 
                            climate_scores + 
-                           flood +
+                           meanflood +
                            MD_index, data = combined_data)
 autoplot(mod_sufficieny_main)
 summary(mod_sufficieny_main)
@@ -182,8 +189,8 @@ nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Financial support")+
   #ylim(0.95,1.26)+
-  scale_y_continuous(breaks = seq(0, 1.27, by=0.05), limits=c(0.95,1.27),
-                     sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 93, by=3.5)))+
+  scale_y_continuous(breaks = seq(0, 1.27, by=0.05), limits=c(0.95,1.27))+
+                     #sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 93, by=3.5)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -211,8 +218,8 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Advert sufficiency")+
  #ylim(11.3,13)+
-  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13),
-                     sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
+                     #sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -239,8 +246,8 @@ nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
         axis.text.x = element_blank())+
   xlab("Nudge") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.23,6.5),
-                     sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.23,6.5))+
+                     #sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Absent","Present"))
 
 nsym
@@ -260,8 +267,8 @@ nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none")+
   xlab("Nudge") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.08), limits=c(3.4,3.9),
-                     sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.3)))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.08), limits=c(3.4,3.9))+
+                     #sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.3)))+
   scale_x_discrete(labels = c("Absent","Present"))+
   geom_signif(comparisons = list(c("absent", "present")), 
               map_signif_level=TRUE,
@@ -278,7 +285,7 @@ nudge_plot <- ggarrange(ns, nsym, nf, nb,
                         ncol = 2, nrow = 2,
                         align = 'v')
 nudge_plot
-ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 8)
+ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 6)
 
 
 ##Mean and SE summary for message framing----
@@ -353,8 +360,8 @@ mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_fr
         legend.position = "none")+
   xlab(" \n Message framing") + ylab("Financial support")+
   #ylim(0.95,1.26)+
-  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26),
-                     sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 1100, by=3.50)))+
+  scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
+                     #sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 1100, by=3.50)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mf
@@ -375,8 +382,8 @@ ms <- ggplot(message.sufficiency, aes(x=message_framing, y=mean, colour = messag
         axis.text.x = element_blank())+
   xlab(" \n Message framing") + ylab("Advert sufficiency")+
   #ylim(11.3,13)+
-  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13),
-                     sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
+  scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
+                     #sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 ms
 
@@ -397,8 +404,8 @@ msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message
         axis.text.x = element_blank())+
   xlab(" \n Message framing") + ylab("Sympathetic attitudes")+
   #ylim(31.2,32.6)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5),
-                     sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5))+
+                     #sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 msym
@@ -417,8 +424,8 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
         legend.position = "none")+
   xlab(" \n Message framing") + ylab("Behavioural support")+
   #ylim(51,56.2)+
-  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8),
-                     sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
+  scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8))+
+                     #sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
   scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
 
 mb
@@ -428,11 +435,9 @@ message_plot <- ggarrange(ms, msym, mf, mb,
                           ncol = 2, nrow = 2,
                           align = 'v')
 message_plot
-ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =9)
+ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =7)
 
 ##Scatter plots----
-
-combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
 
 ###Climate plot----
 #climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
@@ -635,44 +640,47 @@ ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
 ##Correlation matrix plot----
 
 #remove all non-numeric variables
-#cor_data<- subset(combined_data, select = -c(X, prolific_id, message_framing, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores))
-#cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
-#NAs <- cor_data[is.na(cor_data$MD_index),]
-#cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
+cor_data<- subset(combined_data, select = -c(prolific_id, message_framing, flood, nudge, alt, allocated_uk_300, allocated_wild_300, letter, gender, ethnicity, other_ethn, education, age, climate_scores, donation, allocation_100))
+cor_data<- mutate_all(cor_data, function(x) as.numeric(as.character(x)))
+NAs <- cor_data[is.na(cor_data$MD_index),]
+cor_data<- subset(cor_data,  MD_index != is.na(MD_index))
 
-#colnames(cor_data) <- c("Flood experience",
-                        #"Social norm 'donation'",
-                        #"Adversity awareness", 
-                        #"Nature connection",
-                        #"Financial support", 
-                        #"Advert sufficiency", 
-                        #"Social norm 'support'", 
-                        #"Sympathetic attitudes",
-                        #"Behavioural support", 
-                        #"Self-efficacy", 
-                        #"Climate change", 
-                        #"Egoistical attitudes", 
-                        #"Education", 
-                        #"Financial security", 
-                        #"Index of Multiple Deprivation")
+colnames(cor_data) <- c("Sympathetic attitudes",
+                        "Behavioural support",
+                        "Advert sufficiency",
+                        "Financial support",
+                        "Climate change",
+                        "Social norm 'support'",
+                        "Social norm 'donation'",
+                        "Egoistical attitudes",
+                        "Self-efficacy", 
+                        "Financial security", 
+                        "Adversity awareness",
+                        "Nature connection",
+                        "Index of Multiple Deprivation",
+                        "Education",
+                        "Flood experience")
 
 #compute a correlation matrix
-#res<- cor(cor_data, method = "pearson", use = "complete.obs")
-#res
+res<- cor(cor_data, method = "pearson", use = "complete.obs")
+res
 
 #get p values
-#res2<- rcorr(as.matrix(cor_data), type = "pearson")
-#res2
+res2<- rcorr(as.matrix(cor_data), type = "pearson")
+res2
 
-#res2$r
-#res2$P
+res2$r
+res2$P
 
 #plot
-#plot.new()
-#dev.off()
+plot.new()
+dev.off()
 
-#cor_plot<- corrplot(res, type = "full", order = "hclust", 
-         #tl.col = "black", tl.srt = 45)
+cor_plot<- corrplot(res, method = 'color',
+                    order = 'alphabet', 
+                    tl.col = "black", 
+                    addCoef.col = 'black',
+                    tl.srt = 45)
 
 #exported manually
 
@@ -691,6 +699,8 @@ library(broom.mixed)
 #Demographics####
 ##Total####
 nrow(combined_data) #1116
+
+#age
 (nrow(subset(combined_data, age=="21"))/nrow(combined_data))*100 #10.46312
 (nrow(subset(combined_data, age=="29.5"))/nrow(combined_data))*100 #18.78216
 (nrow(subset(combined_data, age=="39.5"))/nrow(combined_data))*100 #18.01029
@@ -700,23 +710,29 @@ nrow(combined_data) #1116
 (nrow(subset(combined_data, age=="79.5"))/nrow(combined_data))*100 #1.02916
 (nrow(subset(combined_data, age=="89.5"))/nrow(combined_data))*100 #0.08576329
 
+#gender
 (nrow(subset(combined_data, gender=="(1) Female"))/nrow(combined_data))*100 #50.77187
 (nrow(subset(combined_data, gender=="(3) Male"))/nrow(combined_data))*100 #48.79931
 (nrow(subset(combined_data, gender=="(2) Other"))/nrow(combined_data))*100 #0.4288165
 
+#ethnicity
 (nrow(subset(combined_data, ethnicity=="(1) White or Caucasian"))/nrow(combined_data))*100 #85.24871
 (nrow(subset(combined_data, ethnicity=="(2) Other"))/nrow(combined_data))*100 #14.75129
 
 ###Offsetting means to match original scales----
 
 #Behavioral
+
+sd(combined_data$sufficiency)/sqrt(1166) #0.15959
 max(combined_data$behaviour) #7.202505
 mean(combined_data$behaviour) #3.635307
+sd(combined_data$behaviour)/sqrt(1166) #0.04868924
 7.202505/2 #3.601253
-
 20/7.202505 #2.776812
 3.601253*2.776812 #10
-2.776812*3.635307
+2.776812*3.635307 #10.09456
+2.776812*3.5
+0.04868924*2.776812
 
 #Financial
 max(combined_data$financial)#15.11219
@@ -726,13 +742,43 @@ mean(combined_data$financial) #1.091872
 1100/15.11219 #72.78892
 72.78892*1.091872 #79.47618
 
+mean(combined_data$donation) #21.16509
+median(combined_data$donation)#10
+sd(combined_data$donation)/sqrt(1166) #1.583261
+max(combined_data$donation) #1000
+
+mean(combined_data$allocation_100) #0.400922 (proportion)
+median(combined_data$allocation_100)#0.3
+sd(combined_data$allocation_100)/sqrt(1166) #0.0101862
+
+mean(combined_data$financial)#1.091872
+sd(combined_data$financial)/sqrt(1166) #0.03353252
+max(combined_data$financial)#15.11219
+
+1100/15.11219 #72.78892 constant to convert PCA to £
+72.78892*1.091872 #72.78892
+
+###Wilcoxon test to measure difference from zero----
+wiltest1<- wilcox.test(combined_data$donation, mu = 0)
+wiltest1
+wiltest2<- wilcox.test(combined_data$allocation_100, mu = 0)
+wiltest2
+
+Zstat1<-qnorm(wiltest1$p.value/2)
+Zstat1
+Zstat2<-qnorm(wiltest2$p.value/2)
+Zstat2
+
 #Sympathy
 max(combined_data$sympathy) #7.86907
 mean(combined_data$sympathy) #6.353343
+sd(combined_data$sympathy)/sqrt(1166) #0.03777554
 
-20/7.86907
+20/7.86907 #2.541596
 2.541596*6.353343 #16.14763
 2.541596*3.9 #9.912224
+2.541596*6.2 #9.912224
+2.541596*0.03777554 #0.09601016
 
 ###One-sampled t-tests to measure overall support----
 t.test(combined_data$sufficiency, mu = 10)
@@ -749,7 +795,6 @@ std.error(combined_data$efficacy) #0.1459724
 mean(combined_data$connectedness) #4.797027
 std.error(combined_data$connectedness) #0.03081535
 
-combined_data$experience= combined_data$experience - min(combined_data$experience)
 min(combined_data$experience) #0
 max(combined_data$experience) #7.27827
 
@@ -774,8 +819,10 @@ max(combined_data$climate_scores) # 7.295522
 mean(combined_data$climate_scores) #1.634991
 std.error(combined_data$climate_scores) #0.0454186
 
-mean(combined_data$flood) #1.060892
-std.error(combined_data$flood) #0.08985149
+mean(combined_data$meanflood) #0.3536306
+std.error(combined_data$meanflood) #0.0299505
+max(combined_data$meanflood) #11.3333
+min(combined_data$meanflood)#0
 
 mean(combined_data$MD_index) #5.604631
 std.error(combined_data$MD_index) #0.08188735
@@ -826,8 +873,8 @@ std.error(BD$social_norm_donation) #3.273502
 mean(BD$climate_scores) #1.613207
 std.error(BD$climate_scores) #0.07676703
 
-mean(BD$flood) #1.052885
-std.error(BD$flood) #0.1450216
+mean(BD$meanflood) #0.3509615
+std.error(BD$meanflood) #0.04834053
 
 mean(BD$MD_index) #5.778846
 std.error(BD$MD_index) #0.1403287
@@ -879,8 +926,8 @@ std.error(ES_L$social_norm_donation) #13.19152
 mean(ES_L$climate_scores) #1.686988
 std.error(ES_L$climate_scores) #0.08275331
 
-mean(ES_L$flood) #1.097625
-std.error(ES_L$flood) # 0.1589908
+mean(ES_L$meanflood) #.3658751
+std.error(ES_L$meanflood) #0.05299694
 
 mean(ES_L$MD_index) #5.488127
 std.error(ES_L$MD_index) #0.1455912
@@ -933,8 +980,8 @@ std.error(ES_G$social_norm_donation) #0.7279678
 mean(ES_G$climate_scores) #1.606298
 std.error(ES_G$climate_scores) #0.07644157
 
-mean(ES_G$flood) #1.032345
-std.error(ES_G$flood) # 0.164479
+mean(ES_G$meanflood) #0.344115
+std.error(ES_G$meanflood) #0.05482633
 
 mean(ES_G$MD_index) #5.528302
 std.error(ES_G$MD_index) #0.1390068
@@ -986,8 +1033,8 @@ std.error(nudge$social_norm_donation) #2.060518
 mean(nudge$climate_scores) #1.603202
 std.error(nudge$climate_scores) #0.06230578
 
-mean(nudge$flood) #1.189097
-std.error(nudge$flood) # 0.1431211
+mean(nudge$meanflood) #0.3963657
+std.error(nudge$meanflood) #0.04770705
 
 mean(nudge$MD_index) #5.616695
 std.error(nudge$MD_index) #0.1166016
@@ -1040,8 +1087,8 @@ std.error(no_nudge$social_norm_donation) #8.714181
 mean(no_nudge$climate_scores) #1.667219
 std.error(no_nudge$climate_scores) #0.06617605
 
-mean(no_nudge$flood) #0.9309154
-std.error(no_nudge$flood) # 0.1431211
+mean(no_nudge$meanflood) #0.3103051
+std.error(no_nudge$meanflood) #0.03598957
 
 mean(no_nudge$MD_index) #5.592401
 std.error(no_nudge$MD_index) #0.1079687
