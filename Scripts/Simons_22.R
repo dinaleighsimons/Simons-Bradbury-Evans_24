@@ -721,9 +721,13 @@ nrow(combined_data) #1116
 
 ###Offsetting means to match original scales----
 
+#Sufficiency
+
+mean(combined_data$sufficiency)
+sd(combined_data$sufficiency)/sqrt(1166) #0.15959
+
 #Behavioral
 
-sd(combined_data$sufficiency)/sqrt(1166) #0.15959
 max(combined_data$behaviour) #7.202505
 mean(combined_data$behaviour) #3.635307
 sd(combined_data$behaviour)/sqrt(1166) #0.04868924
@@ -735,6 +739,7 @@ sd(combined_data$behaviour)/sqrt(1166) #0.04868924
 0.04868924*2.776812
 
 #Financial
+
 max(combined_data$financial)#15.11219
 mean(combined_data$financial) #1.091872
 #max in £ is £1100 (donation + allocation_100)
@@ -770,6 +775,7 @@ Zstat2<-qnorm(wiltest2$p.value/2)
 Zstat2
 
 #Sympathy
+
 max(combined_data$sympathy) #7.86907
 mean(combined_data$sympathy) #6.353343
 sd(combined_data$sympathy)/sqrt(1166) #0.03777554
