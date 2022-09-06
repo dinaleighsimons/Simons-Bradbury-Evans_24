@@ -22,7 +22,7 @@ combined_data<- rename(combined_data, meanflood = newflood)
 combined_data$message_framing = as.factor(combined_data$message_framing)
 combined_data$nudge = as.factor(combined_data$nudge)
 
-#make positive for models
+#positive for models
 combined_data$behaviour= combined_data$behaviour - min(combined_data$behaviour)
 combined_data$sympathy= combined_data$sympathy - min(combined_data$sympathy)
 combined_data$climate_scores= combined_data$climate_scores - min(combined_data$climate_scores)
@@ -51,6 +51,8 @@ mod_behaviour_main<- lm(behaviour ~ message_framing +
 autoplot(mod_behaviour_main) #ok
 summary(mod_behaviour_main)
 Anova(mod_behaviour_main)
+
+confint(mod_behaviour_main)
 
 ##Sympathy models----
 
@@ -91,6 +93,8 @@ autoplot(mod_sympathy_int3)
 summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
 Anova(mod_sympathy_int3)
 
+confint(mod_sympathy_int3)
+
 #Use - message framing * climate change significant
 
 ##Financial models----
@@ -119,6 +123,8 @@ with(summary(mod_financial_main), 1 - deviance/null.deviance) #R^2 value
 mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
 anova(mod_financial_main, mod_0, test="F") #F stats and p-value
 
+confint(mod_financial_main)
+
 #check for overdispersion
 #summary(mod_financial_int1)$deviance/summary(mod_financial)$df.residual
 #Anova(mod_financial_int1, test = "F")
@@ -141,6 +147,8 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
 autoplot(mod_sufficieny_main)
 summary(mod_sufficieny_main)
 Anova(mod_sufficieny_main)
+
+confint(mod_sufficieny_main)
 
 #Plots#####
 ##Mean and SE summaries for nudge####
