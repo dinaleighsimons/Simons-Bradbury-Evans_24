@@ -12,6 +12,7 @@ library(survey)
 library(Hmisc)
 library(corrplot)
 library(ggfortify)
+library(performance) #for collinearity checks
 
 #read in data and format dataset
 combined_data <- read.csv("Data/combined_data_PCA_new.csv")
@@ -22,14 +23,145 @@ combined_data<- rename(combined_data, meanflood = newflood)
 combined_data$message_framing = as.factor(combined_data$message_framing)
 combined_data$nudge = as.factor(combined_data$nudge)
 
-#positive for models
+#scaling PCA values for model functionality
 combined_data$behaviour= combined_data$behaviour - min(combined_data$behaviour)
 combined_data$sympathy= combined_data$sympathy - min(combined_data$sympathy)
 combined_data$climate_scores= combined_data$climate_scores - min(combined_data$climate_scores)
 combined_data$experience= combined_data$experience - min(combined_data$experience)
 combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
 
+#undo reverse code for egoism (now 'feel-good' factor)
+combined_data$ego = -(combined_data$ego)
+
 #Models####
+
+##Manipulation tests----
+
+#effect of nudge on perceived social norm
+combined_data %>% 
+  group_by(nudge) %>% 
+  summarise(mean = mean(social_norm), 
+            sd = sd(social_norm),
+            samp_size = n())
+
+ggplot(combined_data, aes(x = social_norm)) + 
+  geom_histogram(binwidth = 1) + 
+  facet_wrap(~nudge, ncol = 1)
+
+t.test(social_norm ~ nudge, combined_data)
+
+normsocialmod<- lm(social_norm ~ nudge + 
+                    finance_security + 
+                    age +
+                    gender +
+                    ethnicity +
+                    education_rank +
+                    MD_index, data = combined_data)
+autoplot(normsocialmod) #ok
+summary(normsocialmod)
+Anova(normsocialmod)
+
+confint(normsocialmod)
+
+#effect of nudge on perceived social norm (finance)
+combined_data %>% 
+  group_by(nudge) %>% 
+  summarise(mean = mean(social_norm_donation), 
+            sd = sd(social_norm_donation),
+            samp_size = n())
+
+ggplot(combined_data, aes(x = log(1 + social_norm_donation))) + 
+  geom_histogram(binwidth = 1) + 
+  facet_wrap(~nudge, ncol = 1)
+
+t.test(log(1 + social_norm_donation) ~ nudge, combined_data)
+
+normsocialmod2<- lm(log(1 + social_norm_donation) ~ nudge + 
+                      finance_security + 
+                      age +
+                      gender +
+                      ethnicity +
+                      education_rank +
+                      MD_index, data = combined_data)
+autoplot(normsocialmod2) #ok
+summary(normsocialmod2)
+Anova(normsocialmod2)
+
+confint(normsocialmod2)
+
+#effect of nudge on self-efficacy
+combined_data %>% 
+  group_by(nudge) %>% 
+  summarise(mean = mean(efficacy), 
+            sd = sd(efficacy),
+            samp_size = n())
+
+ggplot(combined_data, aes(x = efficacy)) + 
+  geom_histogram(binwidth = 1) + 
+  facet_wrap(~nudge, ncol = 1)
+
+t.test(efficacy ~ nudge, combined_data)
+
+normefficacymod<- lm(efficacy ~ nudge + 
+                      finance_security + 
+                      age +
+                      gender +
+                      ethnicity +
+                      education_rank +
+                      MD_index, data = combined_data)
+autoplot(normefficacymod) #ok
+summary(normefficacymod)
+Anova(normefficacymod)
+
+confint(normefficacymod)
+
+#Create output table for manuscript
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_1 <- sprintf("%.3f", summary(normsocialmod)$coefficients[-1,1])
+std_errors_1 <- sprintf("(%.3f)", summary(normsocialmod)$coefficients[-1,2])
+p_values_1 <- sprintf("p = %.3f%s", summary(normsocialmod)$coefficients[-1,4], ifelse(summary(normsocialmod)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_1 <- data.frame(
+  Predictor = rownames(summary(normsocialmod)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_1, std_errors_1, p_values_1, sep = " "),
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_2 <- sprintf("%.3f", summary(normsocialmod2)$coefficients[-1,1])
+std_errors_2 <- sprintf("(%.3f)", summary(normsocialmod2)$coefficients[-1,2])
+p_values_2 <- sprintf("p = %.3f%s", summary(normsocialmod2)$coefficients[-1,4], ifelse(summary(normsocialmod2)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_2 <- data.frame(
+  Predictor = rownames(summary(normsocialmod2)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_2, std_errors_2, p_values_2, sep = " "),
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_3 <- sprintf("%.3f", summary(normefficacymod)$coefficients[-1,1])
+std_errors_3 <- sprintf("(%.3f)", summary(normefficacymod)$coefficients[-1,2])
+p_values_3 <- sprintf("p = %.3f%s", summary(normefficacymod)$coefficients[-1,4], ifelse(summary(normefficacymod)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_3 <- data.frame(
+  Predictor = rownames(summary(normefficacymod)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_3, std_errors_3, p_values_3, sep = " "),
+  check.names = FALSE)
+
+# Merge All Tables
+results_table_final <- merge(results_table_1, results_table_2, by = "Predictor", all = TRUE)
+results_table_final <- merge(results_table_final, results_table_3, by = "Predictor", all = TRUE)
+
+# Add Column Names
+colnames(results_table_final) <- c("Predictor", "Model 1 Estimate (Std. Error, p-value)", "Model 2 Estimate (Std. Error, p-value)", "Model 3 Estimate (Std. Error, p-value)")
+
+# Add R Squared, F-Value, and Degrees of Freedom for Each Model
+results_table_final[9,] <- c("R-Squared", sprintf("%.3f", summary(normsocialmod)$r.squared), sprintf("%.3f", summary(normsocialmod2)$r.squared), sprintf("%.3f", summary(normefficacymod)$r.squared))
+results_table_final[10,] <- c("F-Value", sprintf("%.3f", summary(normsocialmod)$fstatistic[1]), sprintf("%.3f", summary(normsocialmod2)$fstatistic[1]), sprintf("%.3f", summary(normefficacymod)$fstatistic[1]))
+results_table_final[11,] <- c("DF", paste(summary(normsocialmod)$fstatistic[2], summary(normsocialmod)$fstatistic[3], sep = "/"), paste(summary(normsocialmod2)$fstatistic[2], summary(normefficacymod)$fstatistic[3], sep = "/"), paste(summary(normefficacymod)$fstatistic[2], summary(normefficacymod)$fstatistic[3], sep = "/"))
+
+
+# Output the Table in a Text Format
+cat(paste(capture.output(results_table_final), collapse = "\\\\\\n"))
+
 
 ##Behaviour models----
 
@@ -51,8 +183,32 @@ mod_behaviour_main<- lm(behaviour ~ message_framing +
 autoplot(mod_behaviour_main) #ok
 summary(mod_behaviour_main)
 Anova(mod_behaviour_main)
+output <- Anova(mod_behaviour_main)
+output
 
 confint(mod_behaviour_main)
+
+adjustedpbehav <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+adjustedpbehav
+
+#without social norm
+mod_behaviour_main_reduced<- lm(behaviour ~ message_framing +
+                          nudge + 
+                          efficacy + 
+                          connectedness + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores+ 
+                          meanflood+
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_main_reduced) #ok
+summary(mod_behaviour_main_reduced)
+Anova(mod_behaviour_main_reduced)
 
 ##Sympathy models----
 
@@ -91,11 +247,31 @@ mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
                          MD_index, data = combined_data)
 autoplot(mod_sympathy_int3)
 summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
-Anova(mod_sympathy_int3)
+output<- Anova(mod_sympathy_int3)
+output
 
 confint(mod_sympathy_int3)
 
-#Use - message framing * climate change significant
+adjustedpsymp <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+adjustedpsymp
+
+#without social norm
+mod_sympathy_int3_reduced <- lm(sympathy ~ message_framing*climate_scores+
+                         nudge + 
+                         efficacy + 
+                         connectedness + 
+                         finance_security + 
+                         age +
+                         gender +
+                         ethnicity +
+                         education_rank +
+                         experience +
+                         ego + 
+                         meanflood +
+                         MD_index, data = combined_data)
+autoplot(mod_sympathy_int3_reduced)
+summary(mod_sympathy_int3_reduced) #interaction with climate change and global treatment (increased)
+Anova(mod_sympathy_int3_reduced)
 
 ##Financial models----
 
@@ -122,14 +298,18 @@ Anova(mod_financial_main, test = "F")
 with(summary(mod_financial_main), 1 - deviance/null.deviance) #R^2 value
 mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
 anova(mod_financial_main, mod_0, test="F") #F stats and p-value
+output
 
 confint(mod_financial_main)
 
+adjustedpfin <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+adjustedpfin
+
 #check for overdispersion
 #summary(mod_financial_int1)$deviance/summary(mod_financial)$df.residual
-#Anova(mod_financial_int1, test = "F")
+#Anova(mod_financial_int1, test = "F"
 
-##Sufficency models----
+##Sufficiency models----
 mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            nudge + 
                            efficacy + 
@@ -146,9 +326,137 @@ mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            MD_index, data = combined_data)
 autoplot(mod_sufficieny_main)
 summary(mod_sufficieny_main)
-Anova(mod_sufficieny_main)
+output <- Anova(mod_sufficieny_main)
+output
+
+adjustedpsuf <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+adjustedpsuf
 
 confint(mod_sufficieny_main)
+
+
+#Create output table for manuscript----
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_1 <- sprintf("%.3f", summary(mod_behaviour_main)$coefficients[-1,1])
+std_errors_1 <- sprintf("(%.3f)", summary(mod_behaviour_main)$coefficients[-1,2])
+p_values_1 <- sprintf("p = %.3f%s", summary(mod_behaviour_main)$coefficients[-1,4], ifelse(summary(mod_behaviour_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_1 <- data.frame(
+  Predictor = rownames(summary(mod_behaviour_main)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_1, std_errors_1, p_values_1, sep = " "),
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_2 <- sprintf("%.3f", summary(mod_sympathy_main)$coefficients[-1,1])
+std_errors_2 <- sprintf("(%.3f)", summary(mod_sympathy_main)$coefficients[-1,2])
+p_values_2 <- sprintf("p = %.3f%s", summary(mod_sympathy_main)$coefficients[-1,4], ifelse(summary(mod_sympathy_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_2 <- data.frame(
+  Predictor = rownames(summary(mod_sympathy_main)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_2, std_errors_2, p_values_2, sep = " "),
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_3 <- sprintf("%.3f", summary(mod_financial_main)$coefficients[-1,1])
+std_errors_3 <- sprintf("(%.3f)", summary(mod_financial_main)$coefficients[-1,2])
+p_values_3 <- sprintf("p = %.3f%s", summary(mod_financial_main)$coefficients[-1,4], ifelse(summary(mod_financial_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_3 <- data.frame(
+  Predictor = rownames(summary(mod_financial_main)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_3, std_errors_3, p_values_3, sep = " "),
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+estimates_4 <- sprintf("%.3f", summary(mod_sufficieny_main)$coefficients[-1,1])
+std_errors_4 <- sprintf("(%.3f)", summary(mod_sufficieny_main)$coefficients[-1,2])
+p_values_4 <- sprintf("p = %.3f%s", summary(mod_sufficieny_main)$coefficients[-1,4], ifelse(summary(mod_sufficieny_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_4 <- data.frame(
+  Predictor = rownames(summary(mod_sufficieny_main)$coefficients)[-1],
+  `Parameter Estimate (Std. Error)` = paste(estimates_4, std_errors_4, p_values_4, sep = " "),
+  check.names = FALSE)
+
+# Merge All Tables
+results_table_final <- merge(results_table_1, results_table_2, by = "Predictor", all = TRUE)
+suppressWarnings(results_table_final <- merge(results_table_final, results_table_3, by = "Predictor", all = TRUE))
+suppressWarnings(results_table_final <- merge(results_table_final, results_table_4, by = "Predictor", all = TRUE))
+
+# Add Column Names
+colnames(results_table_final) <- c("Predictor", "Behavioural", "Sympathetic", "Financial", "Sufficiency")
+
+# Add R Squared, F-Value, and Degrees of Freedom for Each Model
+#results_table_final[21,] <- c("R-Squared", sprintf("%.3f", summary(mod_behaviour_main)$r.squared), sprintf("%.3f", summary(mod_sympathy_main)$r.squared), sprintf("%.3f", summary(mod_financial_main)$r.squared), sprintf("%.3f", summary(mod_sufficieny_main)$r.squared))
+#results_table_final[22,] <- c("F-Value", sprintf("%.3f", summary(mod_behaviour_main)$fstatistic[1]), sprintf("%.3f", summary(mod_sympathy_main)$fstatistic[1]), sprintf("%.3f", summary(mod_financial_main)$fstatistic[1]), sprintf("%.3f", summary(normefficacymod)$fstatistic[1]))
+#results_table_final[23,] <- c("DF", paste(summary(mod_behaviour_main)$fstatistic[2], summary(mod_behaviour_main)$fstatistic[3], sep = "/"), 
+                              #paste(summary(mod_sympathy_main)$fstatistic[2], summary(mod_sympathy_main)$fstatistic[3], sep = "/"), 
+                              #paste(summary(mod_financial_main)$fstatistic[2], summary(mod_financial_main)$fstatistic[3], sep = "/"),
+                              #paste(summary(mod_sufficieny_main)$fstatistic[2], summary(mod_sufficieny_main)$fstatistic[3], sep = "/"))
+
+# With confidence intervals
+# Output the Table in a Text Format
+cat(paste(capture.output(results_table_final), collapse = "\\\\\\n"))
+
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+betas_1 <- summary(mod_behaviour_main)$coefficients[-1,1]
+se_1 <- summary(mod_behaviour_main)$coefficients[-1,2]
+ci_1 <- paste0("[", round(betas_1 - 1.96*se_1, 3), ", ", round(betas_1 + 1.96*se_1, 3), "]")
+p_values_1 <- sprintf("p = %.3f%s", summary(mod_behaviour_main)$coefficients[-1,4], ifelse(summary(mod_behaviour_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_1 <- data.frame(
+  Predictor = rownames(summary(mod_behaviour_main)$coefficients)[-1],
+  `Parameter Estimate` = sprintf("%.3f", betas_1),
+  `95% CI` = ci_1,
+  `P-Value` = p_values_1,
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+betas_2 <- summary(mod_sympathy_main)$coefficients[-1,1]
+se_2 <- summary(mod_sympathy_main)$coefficients[-1,2]
+ci_2 <- paste0("[", round(betas_2 - 1.96*se_2, 3), ", ", round(betas_2 + 1.96*se_2, 3), "]")
+p_values_2 <- sprintf("p = %.3f%s", summary(mod_sympathy_main)$coefficients[-1,4], ifelse(summary(mod_sympathy_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_2 <- data.frame(
+  Predictor = rownames(summary(mod_sympathy_main)$coefficients)[-1],
+  `Parameter Estimate` = sprintf("%.3f", betas_2),
+  `95% CI` = ci_2,
+  `P-Value` = p_values_2,
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+betas_3 <- summary(mod_financial_main)$coefficients[-1,1]
+se_3 <- summary(mod_financial_main)$coefficients[-1,2]
+ci_3 <- paste0("[", round(betas_3 - 1.96*se_3, 3), ", ", round(betas_3 + 1.96*se_3, 3), "]")
+p_values_3 <- sprintf("p = %.3f%s", summary(mod_financial_main)$coefficients[-1,4], ifelse(summary(mod_financial_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_3 <- data.frame(
+  Predictor = rownames(summary(mod_financial_main)$coefficients)[-1],
+  `Parameter Estimate` = sprintf("%.3f", betas_3),
+  `95% CI` = ci_3,
+  `P-Value` = p_values_3,
+  check.names = FALSE)
+
+# Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
+betas_4 <- summary(mod_sufficieny_main)$coefficients[-1,1]
+se_4 <- summary(mod_sufficieny_main)$coefficients[-1,2]
+ci_4 <- paste0("[", round(betas_4 - 1.96*se_4, 3), ", ", round(betas_4 + 1.96*se_4, 3), "]")
+p_values_4 <- sprintf("p = %.3f%s", summary(mod_sufficieny_main)$coefficients[-1,4], ifelse(summary(mod_sufficieny_main)$coefficients[-1,4] < 0.05, "*", ""))
+
+results_table_4 <- data.frame(
+  Predictor = rownames(summary(mod_sufficieny_main)$coefficients)[-1],
+  `Parameter Estimate` = sprintf("%.3f", betas_4),
+  `95% CI` = ci_4,
+  `P-Value` = p_values_4,
+  check.names = FALSE)
+
+# Merge All Tables
+results_table_final <- merge(results_table_1, results_table_2, by = "Predictor", all = TRUE)
+results_table_final <- merge(results_table_final, results_table_3, by = "Predictor", all = TRUE)
+results_table_final <- merge(results_table_final, results_table_4, by = "Predictor", all = TRUE)
+
+# Add Column Names
+colnames(results_table_final) <- c("Predictor", "Behavioural_E", "Behv_CI", "Behv_p", "Sympathetic", "Sympathetic", "Sympathetic", "Financial","Financial","Financial", "Sufficiency","Sufficiency","Sufficiency")
+
 
 #Plots#####
 ##Mean and SE summaries for nudge####
@@ -692,17 +1000,36 @@ cor_plot<- corrplot(res, method = 'color',
 
 #exported manually
 
+##Tolerance analysis----
+#A variance inflation factor (VIF) less than 5 indicates a low correlation of that predictor with other predictors. 
+#A value between 5 and 10 indicates a moderate correlation
+#VIF values larger than 10 are a sign for high, not tolerable correlation of model predictors (James et al. 2013)
+
+# Group your models in a named list:
+  tot_lm <- list(
+    behaviour = mod_behaviour_main,
+    sympathy  = mod_sympathy_main,
+    finance = mod_financial_main,
+    sufficiency = mod_sufficieny_main
+  )
+  
+# Get a nice dataframe with Variance Inflation Factor values:
+tolerance<- purrr::map_dfr(tot_lm, performance::check_collinearity, .id = "Response") %>%
+  as_tibble() %>%
+  select(Response, Predictor = Term, VIF, `SE factor` = SE_factor) %>%
+  mutate(across(c(VIF, `SE factor`), ~round(.x, 3)))
+
+View(tolerance) #all values below 2, therefore all predictors are acceptable to be included in the model
 
 ##Model summary plots----
 library(jtools)
 library(ggstance)
 library(broom.mixed)
 
-
 #plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympathy_int3, scale = TRUE)
 
 #plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main, scale = TRUE, 
-           #model.names = c("Behaviour", "Sufficency", "Finance"))
+           #model.names = c("Behaviour", "Finance"))
 
 #Demographics####
 ##Total####
