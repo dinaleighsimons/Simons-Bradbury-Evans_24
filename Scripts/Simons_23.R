@@ -231,29 +231,29 @@ autoplot(mod_sympathy_main)
 summary(mod_sympathy_main)
 Anova(mod_sympathy_main)
 
-mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
-                         nudge + 
-                         efficacy + 
-                         connectedness + 
-                         social_norm +
-                         finance_security + 
-                         age +
-                         gender +
-                         ethnicity +
-                         education_rank +
-                         experience +
-                         ego + 
-                         meanflood +
-                         MD_index, data = combined_data)
-autoplot(mod_sympathy_int3)
-summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
-output<- Anova(mod_sympathy_int3)
-output
+#mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
+                         #nudge + 
+                         #efficacy + 
+                         #connectedness + 
+                         #social_norm +
+                         #finance_security + 
+                         #age +
+                         #gender +
+                         #ethnicity +
+                         #education_rank +
+                         #experience +
+                         #ego + 
+                         #meanflood +
+                         #MD_index, data = combined_data)
+#autoplot(mod_sympathy_int3)
+#summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
+#output<- Anova(mod_sympathy_int3)
+#output
 
-confint(mod_sympathy_int3)
+#confint(mod_sympathy_int3)
 
-adjustedpsymp <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
-adjustedpsymp
+#adjustedpsymp <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+#adjustedpsymp
 
 #without social norm
 mod_sympathy_int3_reduced <- lm(sympathy ~ message_framing*climate_scores+
@@ -756,17 +756,17 @@ ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height
 ##Scatter plots----
 
 ###Climate plot----
-#climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
-  #geom_point(size=0.5) +
-  #geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
-  #theme_classic() +
-  #labs(x = "Climate change scepticism", y = "Sympathetic attitudes (transformed)")+
-  #theme(text = element_text(size = 10)) +
-  #guides(color=guide_legend("Message framing"), fill = "none")
+climateplot<- ggplot(combined_data, aes(x=climate_scores, y=sympathy^2, colour = message_framing))+
+  geom_point(size=0.5) +
+  geom_smooth(method = "lm", alpha = 0.08, se = T, size = 0.7)+
+  theme_classic() +
+  labs(x = "Climate change scepticism", y = "Sympathetic attitudes (transformed)")+
+  theme(text = element_text(size = 10)) +
+  guides(color=guide_legend("Message framing"), fill = "none")
 
-#climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
-                                                #labels = c("Biodiversity", "ES-global", "ES-local"))
-#climateplot
+climateplot<- climateplot + scale_colour_manual(values = c("black", "sky blue", "grey70"),
+                                                labels = c("Biodiversity", "ES-global", "ES-local"))
+climateplot
 
 #ggsave(path = "Figures", filename = "sc_plot.png", width = 8, height = 5)
 
@@ -815,9 +815,23 @@ ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height
 
 ###Sympathetic plots----
 
-nature_symp<- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
+#### sympathy ~ connectedness
+#updated plot using pred
+#symp.mod.2 <- lm(sympathy ~ connectedness, data = combined_data)
+#anova(symp.mod.2)
+#pred.data.symp <- expand.grid(connectedness = 0:7)
+#pred.data.symp <- mutate(pred.data.symp, sympathy = predict(symp.mod.2, pred.data.symp))
+#pred.data.symp
+
+#ggplot(pred.data.symp, aes(x = connectedness, y = sympathy)) + 
+  #geom_line(color = "darkgreen", size = 1) + geom_point(data = combined_data) + 
+  #xlab("Nature connection") + ylab("Sympathetic attitudes")+
+  #theme_classic()
+
+#not using pred
+nature_symp <- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T, color = "green3")+
   theme_classic()+
   labs(x = "Nature connection", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
@@ -828,9 +842,23 @@ nature_symp<- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
                                               #labels = c("Biodiversity", "ES-global", "ES-local"))
 nature_symp
 
+#### sympathy ~ efficacy
+#updated plot using pred
+#symp.mod.3 <- lm(sympathy ~ efficacy, data = combined_data)
+#anova(symp.mod.3)
+#pred.data.symp.3 <- expand.grid(efficacy = 0:20)
+#pred.data.symp.3 <- mutate(pred.data.symp.3, sympathy = predict(symp.mod.3, pred.data.symp.3))
+#pred.data.symp.3
+
+#ggplot(pred.data.symp.3, aes(x = efficacy, y = sympathy)) + 
+  #geom_line(color = "green3", size = 1) + geom_point(data = combined_data) + 
+  #xlab("Self-efficacy") + ylab("Sympathetic attitudes") +
+  #theme_classic()
+
+#using in-built
 efficacy_symp<- ggplot(combined_data, aes(x=efficacy, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T, color = "green3")+
   theme_classic()+
   labs(x = "Self-efficacy", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
@@ -842,9 +870,9 @@ efficacy_symp
 
 social_symp <- ggplot(combined_data, aes(x=social_norm, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T, color = "green3")+
   theme_classic()+
-  labs(x = "Social norm", y = "Sympathetic attitudes")+
+  labs(x = "Social norm support", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
         axis.title.y = element_blank(),
         legend.position = "none")+
@@ -854,10 +882,25 @@ social_symp
 
 ###Financial plots----
 
+#updated plot using pred
+#fin.mod.1 <- glm(financial ~ connectedness, data = combined_data, family = "quasipoisson")
+#anova(fin.mod.1)
+#pred.data.fin.1 <- expand.grid(connectedness = 0:7)
+#pred.data.fin.1 <- mutate(pred.data.fin.1, financial = predict(fin.mod.1, pred.data.fin.1))
+#pred.data.fin.1
+
+#ggplot(pred.data.fin.1, aes(x = connectedness, y = financial)) + 
+  #geom_line(color = "blue", size = 1) + geom_point(data = combined_data) + 
+  #xlab("Self-efficacy") + ylab("Sympathetic attitudes") +
+  #theme_classic()
+
+#with in-built
+
 nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
-              method.args = list(family = "quasipoisson"))+
+              method.args = list(family = "quasipoisson"),
+              color = "red4")+
   theme_classic()+
   labs(x = "Nature connection", y = "Financial support")+
   theme(text = element_text(size = 15),
@@ -867,12 +910,13 @@ nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
 
 suppressWarnings(print(nature_fin))
 
-#warnings ok - limited axis to not present extreme values to improve visualization
+#warnings ok - limited axis to not present outliers
 
 efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
-              method.args = list(family = "quasipoisson"))+
+              method.args = list(family = "quasipoisson"),
+              color = "red4")+
   theme_classic()+
   labs(x = "Self-efficacy", y = "Finanical support")+
   theme(text = element_text(size = 15),
@@ -883,12 +927,24 @@ efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
 
 suppressWarnings(print(efficacy_fin))
 
-#warnings ok - limited axis to not present extreme values to improve visualization
+#warnings ok - limited axis to not present outliers
+
+#fin.mod.3 <- glm(financial ~ log(1+social_norm_donation), data = combined_data, family = "quasipoisson")
+#anova(fin.mod.3)
+#pred.data.fin.3 <- expand.grid(social_norm_donation = 0:20)
+#pred.data.fin.3 <- mutate(pred.data.fin.3, financial = predict(fin.mod.3, pred.data.fin.3))
+#pred.data.fin.3
+
+#ggplot(pred.data.fin.3, aes(x = log(1+social_norm_donation), y = financial)) + 
+  #geom_line(color = "blue", size = 1) + geom_point(data = combined_data) + 
+  #xlab("Self-efficacy") + ylab("Financial support") +
+  #theme_classic()
 
 social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
-              method.args = list(family = "quasipoisson"))+
+              method.args = list(family = "quasipoisson"),
+              color = "red4")+
   theme_classic()+
   labs(x = "Social norm donation (transformed) ", y = "Finanical support")+
   theme(text = element_text(size = 15),
@@ -901,7 +957,7 @@ social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financi
 
 suppressWarnings(print(social_fin))
 
-#warnings ok - limited axis to not present extreme values to improve visualization
+#warnings ok - limited axis to not present outliers
 
 ###Behaviour plots----
 
@@ -930,7 +986,7 @@ social_behav <- ggplot(combined_data, aes(x=social_norm, y=behaviour))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "lm", se=T)+
   theme_classic()+
-  labs(x = "Social norm", y = "Behavioural support")+
+  labs(x = "Social norm support", y = "Behavioural support")+
   theme(text = element_text(size = 15),
         axis.title.y = element_blank())+
   guides(color=guide_legend("Message framing"), fill = "none")
