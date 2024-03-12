@@ -1,9 +1,11 @@
-#Simons, Bradbury and Evans (2022) main script
+#Simons, Bradbury and Evans (2024) - Models and figures script
 
-#Setting environment----
+#Setting environment------------------------------------------------------------
+
+##Clear global environment----
 rm(list = ls())
 
-#load packages
+##Load packages----
 library(ggpubr)
 library(ggplot2)
 library(dplyr)
@@ -12,12 +14,19 @@ library(survey)
 library(Hmisc)
 library(corrplot)
 library(ggfortify)
-library(performance) #for collinearity checks
+library(performance) #for colinearity checks
+library(jtools) #for model plots
+library(ggstance) #for model plots
+library(broom.mixed) #for model plots
+library(sjPlot) #https://strengejacke.github.io/sjPlot/reference/plot_models.html
+library(sjlabelled)
+library(sjmisc)
 
-#read in data and format dataset
+##Read in data----
 combined_data <- read.csv("Data/combined_data_PCA_new.csv")
 str(combined_data)
 
+##Data tidying----
 combined_data <- combined_data %>% select(-c("X.1", "X"))
 combined_data<- rename(combined_data, meanflood = newflood)
 combined_data$message_framing = as.factor(combined_data$message_framing)
@@ -33,11 +42,11 @@ combined_data$social_norm= combined_data$social_norm - min(combined_data$social_
 #undo reverse code for egoism (now 'feel-good' factor)
 combined_data$ego = -(combined_data$ego)
 
-#Models####
+#Regression models--------------------------------------------------------------
 
 ##Manipulation tests----
 
-#effect of nudge on perceived social norm
+###Effect of nudge on perceived social norm----
 combined_data %>% 
   group_by(nudge) %>% 
   summarise(mean = mean(social_norm), 
@@ -63,7 +72,7 @@ Anova(normsocialmod)
 
 confint(normsocialmod)
 
-#effect of nudge on perceived social norm (finance)
+###Effect of nudge on perceived social norm (finance)----
 combined_data %>% 
   group_by(nudge) %>% 
   summarise(mean = mean(social_norm_donation), 
@@ -89,7 +98,7 @@ Anova(normsocialmod2)
 
 confint(normsocialmod2)
 
-#effect of nudge on self-efficacy
+###Effect of nudge on self-efficacy----
 combined_data %>% 
   group_by(nudge) %>% 
   summarise(mean = mean(efficacy), 
@@ -115,7 +124,7 @@ Anova(normefficacymod)
 
 confint(normefficacymod)
 
-#Create output table for manuscript
+###Create output table for manuscript----
 # Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
 estimates_1 <- sprintf("%.3f", summary(normsocialmod)$coefficients[-1,1])
 std_errors_1 <- sprintf("(%.3f)", summary(normsocialmod)$coefficients[-1,2])
@@ -158,10 +167,8 @@ results_table_final[9,] <- c("R-Squared", sprintf("%.3f", summary(normsocialmod)
 results_table_final[10,] <- c("F-Value", sprintf("%.3f", summary(normsocialmod)$fstatistic[1]), sprintf("%.3f", summary(normsocialmod2)$fstatistic[1]), sprintf("%.3f", summary(normefficacymod)$fstatistic[1]))
 results_table_final[11,] <- c("DF", paste(summary(normsocialmod)$fstatistic[2], summary(normsocialmod)$fstatistic[3], sep = "/"), paste(summary(normsocialmod2)$fstatistic[2], summary(normefficacymod)$fstatistic[3], sep = "/"), paste(summary(normefficacymod)$fstatistic[2], summary(normefficacymod)$fstatistic[3], sep = "/"))
 
-
 # Output the Table in a Text Format
 cat(paste(capture.output(results_table_final), collapse = "\\\\\\n"))
-
 
 ##Behaviour models----
 
@@ -188,8 +195,9 @@ output
 
 confint(mod_behaviour_main)
 
-adjustedpbehav <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
-adjustedpbehav
+adjustedpbehav <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbehav #check FDR adjusted
+round(output$`Pr(>F)`, digits = 4) #check original
 
 #without social norm
 mod_behaviour_main_reduced<- lm(behaviour ~ message_framing +
@@ -335,7 +343,8 @@ adjustedpsuf
 confint(mod_sufficieny_main)
 
 
-#Create output table for manuscript----
+#Create output table for manuscript---------------------------------------------
+
 # Extract Parameter Estimates, Standard Errors, and P-Values and Create a Table with the Results
 estimates_1 <- sprintf("%.3f", summary(mod_behaviour_main)$coefficients[-1,1])
 std_errors_1 <- sprintf("(%.3f)", summary(mod_behaviour_main)$coefficients[-1,2])
@@ -458,8 +467,9 @@ results_table_final <- merge(results_table_final, results_table_4, by = "Predict
 colnames(results_table_final) <- c("Predictor", "Behavioural_E", "Behv_CI", "Behv_p", "Sympathetic", "Sympathetic", "Sympathetic", "Financial","Financial","Financial", "Sufficiency","Sufficiency","Sufficiency")
 
 
-#Plots#####
-##Mean and SE summaries for nudge####
+#Plots--------------------------------------------------------------------------
+
+##Mean and SE summaries for nudge----
 
 nudge.finance <- combined_data %>% 
   group_by(nudge) %>% 
@@ -815,7 +825,7 @@ climateplot
 
 ###Sympathetic plots----
 
-#### sympathy ~ connectedness
+---- sympathy ~ connectedness
 #updated plot using pred
 #symp.mod.2 <- lm(sympathy ~ connectedness, data = combined_data)
 #anova(symp.mod.2)
@@ -842,7 +852,7 @@ nature_symp <- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
                                               #labels = c("Biodiversity", "ES-global", "ES-local"))
 nature_symp
 
-#### sympathy ~ efficacy
+---- sympathy ~ efficacy
 #updated plot using pred
 #symp.mod.3 <- lm(sympathy ~ efficacy, data = combined_data)
 #anova(symp.mod.3)
@@ -1078,17 +1088,129 @@ tolerance<- purrr::map_dfr(tot_lm, performance::check_collinearity, .id = "Respo
 View(tolerance) #all values below 2, therefore all predictors are acceptable to be included in the model
 
 ##Model summary plots----
-library(jtools)
-library(ggstance)
-library(broom.mixed)
+#Variables for plotting
+all.models <- list()
+all.models[[1]] <- mod_sufficieny_main
+all.models[[2]] <- mod_sympathy_main
+all.models[[3]] <- mod_behaviour_main
+all.models[[4]] <- mod_financial_main
 
-#plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main,mod_sympathy_int3, scale = TRUE)
+treatment_terms <- c("message_framinges-global",
+                     "message_framinges-local",
+                     "nudgepresent")
 
-#plot_summs(mod_behaviour_main,mod_sufficieny_main, mod_financial_main, scale = TRUE, 
-           #model.names = c("Behaviour", "Finance"))
+treatment_terms_label <- c("Nudge",
+                           "Local-ES",
+                           "Global-ES")
 
-#Demographics####
-##Total####
+socio_terms<- c("age",
+                "finance_security",
+                "gender(2) Other",
+                "gender(3) Male",
+                "ethnicity(2) Other",
+                "education_rank",
+                "MD_index")
+
+socio_terms_labels <- c("MD Index",
+                "Education",
+                "Ethnicity (Other)",
+                "Gender (Male)",
+                "Age",
+                "Financial security")
+
+psyco_terms <- c("connectedness",
+                 "experience",
+                 "ego",
+                 "climate_scores",
+                 "meanflood",
+                 "social_norm",
+                 "log(1 + social_norm_donation)",
+                 "efficacy")
+
+psyco_terms_labels <- c("Percieved social norm (donation)",
+                 "Percieved social norm",
+                 "Flood experience",
+                 "Climate change sceptisism",
+                 "Egoism",
+                 "Global South awareness",
+                 "Nature connection",
+                 "Self-efficacy")
+
+model_names <- c("Advert sufficency", "Sympathetic attitudes", "Behavioural support", "Finance support")
+
+###Treatments variables----
+model_sum_treatments <- plot_models(all.models,
+            vline.color = "black",
+            show.values = TRUE,
+            rm.terms = c(socio_terms, psyco_terms),
+            spacing = 0.75,
+            show.p = T,
+            colors = NULL,
+            m.labels = model_names,
+            legend.title = "Outcome variables",
+            axis.labels = treatment_terms_label,
+            value.size = 4,
+            dot.size = 3,
+            p.shape = T,
+            legend.pval.title = "Significance level") +
+  theme_classic()
+
+model_sum_treatments<- model_sum_treatments + theme(axis.text.y = element_text(angle = 40, vjust = 0.5, hjust=1))
+model_sum_treatments
+
+ggsave(path = "Figures", filename = "model_sum_treatments_plot.png", model_sum_treatments, height =6, width =8)
+
+###Psyco variables----
+
+model_sum_psyco <- plot_models(all.models,
+                                    vline.color = "black",
+                                    show.values = TRUE,
+                                    rm.terms = c(socio_terms, treatment_terms),
+                                    spacing = 0.75,
+                                    show.p = T,
+                                    colors = NULL,
+                                    m.labels = model_names,
+                                    legend.title = "Outcome variables",
+                                    axis.labels = psyco_terms_labels,
+                                    value.size = 4,
+                                    dot.size = 3,
+                                    p.shape = T,
+                                    legend.pval.title = "Significance level") +
+  theme_classic()
+
+model_sum_psyco<- model_sum_psyco + theme(axis.text.y = element_text(angle = 40, vjust = 0.5, hjust=1))
+model_sum_psyco
+
+ggsave(path = "Figures", filename = "model_sum_psyco_plot.png", model_sum_psyco, height =12, width =8)
+
+
+###sociodemo variables----
+
+model_sum_socio <- plot_models(all.models,
+                               vline.color = "black",
+                               show.values = TRUE,
+                               rm.terms = c(psyco_terms, treatment_terms, "gender(2) Other"),
+                               spacing = 0.75,
+                               show.p = T,
+                               colors = NULL,
+                               m.labels = model_names,
+                               legend.title = "Outcome variables",
+                               axis.labels = socio_terms_labels,
+                               value.size = 4,
+                               dot.size = 3,
+                               p.shape = T,
+                               legend.pval.title = "Significance level") +
+  theme_classic()
+
+model_sum_socio<- model_sum_socio + theme(axis.text.y = element_text(angle = 40, vjust = 0.5, hjust=1))
+model_sum_socio
+
+ggsave(path = "Figures", filename = "model_sum_socio_plot.png", model_sum_socio, height =10, width =8)
+
+
+#Demographics-------------------------------------------------------------------
+
+##Total----
 nrow(combined_data) #1116
 
 #age
@@ -1230,7 +1352,7 @@ std.error(combined_data$finance_security) #0.1447148
 mean(combined_data$education_rank) #3.578045
 std.error(combined_data$education_rank) # 0.02884719
 
-##MS-BD####
+##MS-BD----
 BD <- subset(combined_data, message_framing=="biodiversity")
 nrow(BD) #416
 (nrow(subset(BD, age=="21"))/nrow(BD))*100 #10.57692
@@ -1283,7 +1405,7 @@ mean(BD$education_rank) #3.591346
 std.error(BD$education_rank) # 0.04569822
 
 
-##MS-ES-L####
+##MS-ES-L----
 ES_L <- subset(combined_data, message_framing=="es-local")
 nrow(ES_L) #379
 (nrow(subset(ES_L, age=="21"))/nrow(ES_L))*100 #10.02639
@@ -1336,7 +1458,7 @@ mean(ES_L$education_rank) #3.649077
 std.error(ES_L$education_rank) # 0.04569822
 
 
-##MS-ES-G####
+##MS-ES-G----
 ES_G <- subset(combined_data, message_framing=="es-global")
 nrow(ES_G) #371
 (nrow(subset(ES_G, age=="21"))/nrow(ES_G))*100 #10.78167
@@ -1389,7 +1511,7 @@ std.error(ES_G$finance_security) #0.2478059
 mean(ES_G$education_rank) #3.649077
 std.error(ES_G$education_rank) # 0.05111968
 
-##MS-Nudge####
+##MS-Nudge----
 nudge<- subset(combined_data, nudge=="present")
 nrow(nudge) #587
 (nrow(subset(nudge, age=="21"))/nrow(nudge))*100 #10.39182
@@ -1443,7 +1565,7 @@ mean(nudge$education_rank) #3.613288
 std.error(nudge$education_rank) # 0.04010326
 
 
-##MS-No Nudge####
+##MS-No Nudge----
 no_nudge<- subset(combined_data, nudge=="absent")
 nrow(no_nudge) #579
 (nrow(subset(no_nudge, age=="21"))/nrow(no_nudge))*100 #10.53541
@@ -1495,30 +1617,3 @@ std.error(no_nudge$finance_security) #0.2093262
 
 mean(no_nudge$education_rank) #3.542314
 std.error(no_nudge$education_rank) # 0.04147629
-
-
-#Other----
-
-##Exploring using survey package
-
-#combined_data<- mutate(combined_data,
-                       #fpc=0)
-
-#combined_data$fpc[combined_data$letter == "A"] <- sum(with(combined_data, letter=="A"))
-#combined_data$fpc[combined_data$letter == "B"] <- sum(with(combined_data, letter=="B"))
-#combined_data$fpc[combined_data$letter == "C"] <- sum(with(combined_data, letter=="C"))
-#combined_data$fpc[combined_data$letter == "D"] <- sum(with(combined_data, letter=="D"))
-#combined_data$fpc[combined_data$letter == "E"] <- sum(with(combined_data, letter=="E"))
-#combined_data$fpc[combined_data$letter == "F"] <- sum(with(combined_data, letter=="F"))
-
-#dstrat <- svydesign(id=~1,strata=~letter,  data=combined_data, weight = 1)
-#summary(dstrat)
-
-#svymean(~sympathy+behaviour+sufficiency+financial, dstrat)
-#svyquantile(~sympathy+behaviour+sufficiency+financial, dstrat, quantile=c(0.25,0.5,0.75), ci=TRUE)
-
-#svytotal(~message_framing, dstrat)
-#svytotal(~nudge, dstrat)
-#svytotal(~letter, dstrat)
-
-#svyby(~sympathy+behaviour+financial+sufficiency, ~message_framing, design=dstrat, svymean)
