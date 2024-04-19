@@ -39,7 +39,7 @@ combined_data$climate_scores= combined_data$climate_scores - min(combined_data$c
 combined_data$experience= combined_data$experience - min(combined_data$experience)
 combined_data$social_norm= combined_data$social_norm - min(combined_data$social_norm)
 
-#undo reverse code for egoism (now 'feel-good' factor)
+#undo reverse code for egoism (now psychological benefits)
 combined_data$ego = -(combined_data$ego)
 
 #Regression models--------------------------------------------------------------
@@ -170,154 +170,8 @@ results_table_final[11,] <- c("DF", paste(summary(normsocialmod)$fstatistic[2], 
 # Output the Table in a Text Format
 cat(paste(capture.output(results_table_final), collapse = "\\\\\\n"))
 
-##Behaviour models----
-
-mod_behaviour_main<- lm(behaviour ~ message_framing +
-                          nudge + 
-                          efficacy + 
-                          connectedness + 
-                          social_norm +
-                          finance_security + 
-                          age +
-                          gender +
-                          ethnicity +
-                          education_rank +
-                          experience + 
-                          ego + 
-                          climate_scores+ 
-                          meanflood+
-                          MD_index, data = combined_data)
-autoplot(mod_behaviour_main) #ok
-summary(mod_behaviour_main)
-Anova(mod_behaviour_main)
-output <- Anova(mod_behaviour_main)
-output
-
-confint(mod_behaviour_main)
-
-adjustedpbehav <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
-adjustedpbehav #check FDR adjusted
-round(output$`Pr(>F)`, digits = 4) #check original
-
-#without social norm
-mod_behaviour_main_reduced<- lm(behaviour ~ message_framing +
-                          nudge + 
-                          efficacy + 
-                          connectedness + 
-                          finance_security + 
-                          age +
-                          gender +
-                          ethnicity +
-                          education_rank +
-                          experience + 
-                          ego + 
-                          climate_scores+ 
-                          meanflood+
-                          MD_index, data = combined_data)
-autoplot(mod_behaviour_main_reduced) #ok
-summary(mod_behaviour_main_reduced)
-Anova(mod_behaviour_main_reduced)
-
-##Sympathy models----
-
-mod_sympathy_main<- lm(sympathy ~ message_framing+
-                         nudge + 
-                         efficacy + 
-                         connectedness + 
-                         social_norm +
-                         finance_security + 
-                         age +
-                         gender +
-                         ethnicity +
-                         education_rank +
-                         experience + 
-                         ego + 
-                         climate_scores + 
-                         meanflood +
-                         MD_index, data = combined_data)
-autoplot(mod_sympathy_main)
-summary(mod_sympathy_main)
-Anova(mod_sympathy_main)
-
-#mod_sympathy_int3<- lm(sympathy ~ message_framing*climate_scores+
-                         #nudge + 
-                         #efficacy + 
-                         #connectedness + 
-                         #social_norm +
-                         #finance_security + 
-                         #age +
-                         #gender +
-                         #ethnicity +
-                         #education_rank +
-                         #experience +
-                         #ego + 
-                         #meanflood +
-                         #MD_index, data = combined_data)
-#autoplot(mod_sympathy_int3)
-#summary(mod_sympathy_int3) #interaction with climate change and global treatment (increased)
-#output<- Anova(mod_sympathy_int3)
-#output
-
-#confint(mod_sympathy_int3)
-
-#adjustedpsymp <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
-#adjustedpsymp
-
-#without social norm
-mod_sympathy_int3_reduced <- lm(sympathy ~ message_framing*climate_scores+
-                         nudge + 
-                         efficacy + 
-                         connectedness + 
-                         finance_security + 
-                         age +
-                         gender +
-                         ethnicity +
-                         education_rank +
-                         experience +
-                         ego + 
-                         meanflood +
-                         MD_index, data = combined_data)
-autoplot(mod_sympathy_int3_reduced)
-summary(mod_sympathy_int3_reduced) #interaction with climate change and global treatment (increased)
-Anova(mod_sympathy_int3_reduced)
-
-##Financial models----
-
-mod_financial_main<- glm(financial ~ message_framing+
-                           nudge + 
-                           efficacy + 
-                           connectedness + 
-                           log(1 + social_norm_donation) +
-                           finance_security + 
-                           age +
-                           gender +
-                           ethnicity +
-                           education_rank +
-                           experience + 
-                           ego + 
-                           climate_scores + 
-                           meanflood+
-                           MD_index, data = combined_data, family = quasipoisson)
-par(mfrow=c(2,2))
-plot(mod_financial_main)
-summary(mod_financial_main)
-Anova(mod_financial_main, test = "F")
-
-with(summary(mod_financial_main), 1 - deviance/null.deviance) #R^2 value
-mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
-anova(mod_financial_main, mod_0, test="F") #F stats and p-value
-output
-
-confint(mod_financial_main)
-
-adjustedpfin <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
-adjustedpfin
-
-#check for overdispersion
-#summary(mod_financial_int1)$deviance/summary(mod_financial)$df.residual
-#Anova(mod_financial_int1, test = "F"
-
 ##Sufficiency models----
+###Main ----
 mod_sufficieny_main<- lm(sufficiency ~ message_framing +
                            nudge + 
                            efficacy + 
@@ -337,11 +191,1727 @@ summary(mod_sufficieny_main)
 output <- Anova(mod_sufficieny_main)
 output
 
-adjustedpsuf <- round(p.adjust(output$`Pr(>F)`,method="hochberg"), digits = 4)
+adjustedpsuf <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
 adjustedpsuf
 
 confint(mod_sufficieny_main)
 
+###Interactions with MF----
+
+####Interaction 1: MF and nudge----
+mod_sufficieny_int_1<- lm(sufficiency ~ message_framing *
+                           nudge + 
+                           efficacy + 
+                           connectedness + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           climate_scores + 
+                           meanflood +
+                           MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_1)
+summary(mod_sufficieny_int_1)
+output <- Anova(mod_sufficieny_int_1)
+output
+
+confint(mod_sufficieny_int_1)
+
+adjustedpsuf_int_1 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_1
+
+####Interaction 2: MF and self efficacy----
+mod_sufficieny_int_2<- lm(sufficiency ~ message_framing *
+                            efficacy +
+                            nudge + 
+                            connectedness + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_2)
+summary(mod_sufficieny_int_2)
+output <- Anova(mod_sufficieny_int_2)
+output
+
+confint(mod_sufficieny_int_2)
+
+adjustedpsuf_int_2 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_2
+
+####Interacion 3: MF * connection ----
+mod_sufficieny_int_3<- lm(sufficiency ~ message_framing *
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_3)
+summary(mod_sufficieny_int_3)
+output <- Anova(mod_sufficieny_int_3)
+output
+
+confint(mod_sufficieny_int_3)
+
+adjustedpsuf_int_3 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_3
+
+####Interacion 4: MF * experience of developing countries ----
+mod_sufficieny_int_4<- lm(sufficiency ~ message_framing *
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_4)
+summary(mod_sufficieny_int_4)
+output <- Anova(mod_sufficieny_int_4)
+output
+
+confint(mod_sufficieny_int_4)
+
+adjustedpsuf_int_4 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_4
+
+####Interacion 5: MF * benefits ----
+mod_sufficieny_int_5<- lm(sufficiency ~ message_framing *
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_5)
+summary(mod_sufficieny_int_5)
+output <- Anova(mod_sufficieny_int_5)
+output
+
+confint(mod_sufficieny_int_5)
+
+adjustedpsuf_int_5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_5
+
+####Interacion 6: MF * climate scores ----
+mod_sufficieny_int_6<- lm(sufficiency ~ message_framing *
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_6)
+summary(mod_sufficieny_int_6)
+output <- Anova(mod_sufficieny_int_6)
+output
+
+confint(mod_sufficieny_int_6)
+
+adjustedpsuf_int_6 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_6
+
+####Interacion 7: MF * flood ----
+mod_sufficieny_int_7<- lm(sufficiency ~ message_framing *
+                            meanflood +
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_7)
+summary(mod_sufficieny_int_7)
+output <- Anova(mod_sufficieny_int_7)
+output
+
+confint(mod_sufficieny_int_7)
+
+adjustedpsuf_int_7 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_7
+
+### Interactions with nudge ----
+####Interaction 8: nudge and self efficacy----
+mod_sufficieny_int_8<- lm(sufficiency ~ nudge*
+                            efficacy +
+                            message_framing + 
+                            connectedness + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_8)
+summary(mod_sufficieny_int_8)
+output <- Anova(mod_sufficieny_int_8)
+output
+
+confint(mod_sufficieny_int_8)
+
+adjustedpsuf_int_8 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_8
+
+####Interacion 9: Nudge * connection ----
+mod_sufficieny_int_9 <- lm(sufficiency ~ nudge *
+                            connectedness +
+                            efficacy +
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_9)
+summary(mod_sufficieny_int_9)
+output <- Anova(mod_sufficieny_int_9)
+output
+
+confint(mod_sufficieny_int_9)
+
+adjustedpsuf_int_9 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_9
+
+####Interacion 10: nudge * experience of developing countries ----
+mod_sufficieny_int_10<- lm(sufficiency ~ nudge *
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            message_framing  + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_10)
+summary(mod_sufficieny_int_10)
+output <- Anova(mod_sufficieny_int_10)
+output
+
+confint(mod_sufficieny_int_10)
+
+adjustedpsuf_int_10 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_10
+
+####Interacion 11: nudge * benefits ----
+mod_sufficieny_int_11<- lm(sufficiency ~  nudge *
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_11)
+summary(mod_sufficieny_int_11)
+output <- Anova(mod_sufficieny_int_11)
+output
+
+confint(mod_sufficieny_int_11)
+
+adjustedpsuf_int_11 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_11
+
+####Interacion 12: nudge * climate scores ----
+mod_sufficieny_int_12<- lm(sufficiency ~  nudge *
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_12)
+summary(mod_sufficieny_int_12)
+output <- Anova(mod_sufficieny_int_12)
+output
+
+confint(mod_sufficieny_int_12)
+
+adjustedpsuf_int_12 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_12
+
+####Interacion 13: nudge * flood ----
+mod_sufficieny_int_13<- lm(sufficiency ~ nudge *
+                            meanflood +
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data)
+autoplot(mod_sufficieny_int_13)
+summary(mod_sufficieny_int_13)
+output <- Anova(mod_sufficieny_int_13)
+output
+
+confint(mod_sufficieny_int_13)
+
+adjustedpsuf_int_13 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsuf_int_13
+
+
+##Sympathy models----
+###Main ----
+mod_sympathy_main<- lm(sympathy ~ message_framing+
+                         nudge + 
+                         efficacy + 
+                         connectedness + 
+                         social_norm +
+                         finance_security + 
+                         age +
+                         gender +
+                         ethnicity +
+                         education_rank +
+                         experience + 
+                         ego + 
+                         climate_scores + 
+                         meanflood +
+                         MD_index, data = combined_data)
+autoplot(mod_sympathy_main)
+summary(mod_sympathy_main)
+output <- Anova(mod_sympathy_main)
+output
+
+adjustedpsymp <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 15)
+adjustedpsymp
+
+list.pvalues.symp.int <- c("0.742",
+                           "0.793",
+                           "0.378",
+                           "0.620",
+                           "0.664",
+                           "0.976",
+                           "0.001",
+                           "0.425",
+                           "0.848",
+                           "0.696",
+                           "0.134",
+                           "0.508",
+                           "0.750",
+                           "0.906",
+                           "0.588",
+                           output$`Pr(>F)`)
+
+list.pvalues.symp.int
+
+adjustedpsymp.int <- round(p.adjust(list.pvalues.symp.int, method="fdr"), digits = 4)
+adjustedpsymp.int
+
+
+###Interactions with MF----
+
+####Interaction 1: MF and nudge----
+mod_sympathy_int_1<- lm(sympathy ~ message_framing *
+                            nudge + 
+                            efficacy + 
+                            social_norm +
+                            connectedness + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_1)
+summary(mod_sympathy_int_1)
+output <- Anova(mod_sympathy_int_1)
+output
+
+confint(mod_sympathy_int_1)
+
+adjustedpsymp_int_1 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_1
+
+####Interaction 2: MF and self efficacy----
+mod_sympathy_int_2<- lm(sympathy ~ message_framing *
+                            efficacy +
+                            nudge + 
+                            connectedness + 
+                            social_norm +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_2)
+summary(mod_sympathy_int_2)
+output <- Anova(mod_sympathy_int_2)
+output
+
+confint(mod_sympathy_int_2)
+
+adjustedpsymp_int_2 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_2
+
+####Interacion 3: MF * connection ----
+mod_sympathy_int_3<- lm(sympathy ~ message_framing *
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            social_norm +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_3)
+summary(mod_sympathy_int_3)
+output <- Anova(mod_sympathy_int_3)
+output
+
+confint(mod_sympathy_int_3)
+
+adjustedpsymp_int_3 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_3
+
+####Interacion 4: MF * experience of developing countries ----
+mod_sympathy_int_4<- lm(sympathy ~ message_framing *
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            social_norm +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_4)
+summary(mod_sympathy_int_4)
+output <- Anova(mod_sympathy_int_4)
+output
+
+confint(mod_sympathy_int_4)
+
+adjustedpsymp_int_4 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_4
+
+####Interacion 5: MF * benefits ----
+mod_sympathy_int_5<- lm(sympathy ~ message_framing *
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            social_norm +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_5)
+summary(mod_sympathy_int_5)
+output <- Anova(mod_sympathy_int_5)
+output
+
+confint(mod_sympathy_int_5)
+
+adjustedpsymp_int_5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_5
+
+####Interacion 6: MF * climate scores ----
+mod_sympathy_int_6<- lm(sympathy ~ message_framing *
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            social_norm +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_6)
+summary(mod_sympathy_int_6)
+output <- Anova(mod_sympathy_int_6)
+output
+
+confint(mod_sympathy_int_6)
+
+adjustedpsymp_int_6 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_6
+
+####Interacion 7: MF * flood ----
+mod_sympathy_int_7<- lm(sympathy ~ message_framing *
+                            meanflood +
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            social_norm + 
+                            connectedness +
+                            efficacy +
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_7)
+summary(mod_sympathy_int_7)
+output <- Anova(mod_sympathy_int_7)
+output
+
+confint(mod_sympathy_int_7)
+
+adjustedpsymp_int_7 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_7
+
+#Interaction 7.5 - MF * social norm
+mod_sympathy_int_7.5<- lm(sympathy ~ message_framing *
+                          social_norm +
+                          meanflood +
+                          climate_scores +
+                          ego + 
+                          experience +
+                          connectedness +
+                          efficacy +
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          MD_index, data = combined_data)
+autoplot(mod_sympathy_int_7.5)
+summary(mod_sympathy_int_7.5)
+output <- Anova(mod_sympathy_int_7.5)
+output
+
+confint(mod_sympathy_int_7.5)
+
+adjustedpsymp_int_7.5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_7.5
+
+### Interactions with nudge ----
+####Interaction 8: nudge and self efficacy----
+mod_sympathy_int_8<- lm(sympathy ~ nudge*
+                            efficacy +
+                            message_framing + 
+                            connectedness + 
+                            finance_security +
+                            social_norm +
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood +
+                            MD_index, data = combined_data)
+autoplot(mod_sympathy_int_8)
+summary(mod_sympathy_int_8)
+output <- Anova(mod_sympathy_int_8)
+output
+
+confint(mod_sympathy_int_8)
+
+adjustedpsymp_int_8 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_8
+
+####Interacion 9: Nudge * connection ----
+mod_sympathy_int_9 <- lm(sympathy ~ nudge *
+                             connectedness +
+                             efficacy +
+                             message_framing + 
+                             finance_security + 
+                             social_norm +
+                             age +
+                             gender +
+                             ethnicity +
+                             education_rank +
+                             experience + 
+                             ego + 
+                             climate_scores + 
+                             meanflood +
+                             MD_index, data = combined_data)
+autoplot(mod_sympathy_int_9)
+summary(mod_sympathy_int_9)
+output <- Anova(mod_sympathy_int_9)
+output
+
+confint(mod_sympathy_int_9)
+
+adjustedpsymp_int_9 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_9
+
+####Interacion 10: nudge * experience of developing countries ----
+mod_sympathy_int_10<- lm(sympathy ~ nudge *
+                             experience + 
+                             connectedness +
+                             efficacy +
+                             social_norm +
+                             message_framing  + 
+                             finance_security + 
+                             age +
+                             gender +
+                             ethnicity +
+                             education_rank +
+                             ego + 
+                             climate_scores + 
+                             meanflood +
+                             MD_index, data = combined_data)
+autoplot(mod_sympathy_int_10)
+summary(mod_sympathy_int_10)
+output <- Anova(mod_sympathy_int_10)
+output
+
+confint(mod_sympathy_int_10)
+
+adjustedpsymp_int_10 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_10
+
+####Interacion 11: nudge * benefits ----
+mod_sympathy_int_11<- lm(sympathy ~  nudge *
+                             ego + 
+                             experience + 
+                             connectedness +
+                             efficacy +
+                             social_norm +
+                             message_framing + 
+                             finance_security + 
+                             age +
+                             gender +
+                             ethnicity +
+                             education_rank +
+                             climate_scores + 
+                             meanflood +
+                             MD_index, data = combined_data)
+autoplot(mod_sympathy_int_11)
+summary(mod_sympathy_int_11)
+output <- Anova(mod_sympathy_int_11)
+output
+
+confint(mod_sympathy_int_11)
+
+adjustedpsymp_int_11 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_11
+
+####Interacion 12: nudge * climate scores ----
+mod_sympathy_int_12<- lm(sympathy ~  nudge *
+                             climate_scores +
+                             ego + 
+                             experience + 
+                             connectedness +
+                             efficacy +
+                             social_norm +
+                             message_framing + 
+                             finance_security + 
+                             age +
+                             gender +
+                             ethnicity +
+                             education_rank +
+                             meanflood +
+                             MD_index, data = combined_data)
+autoplot(mod_sympathy_int_12)
+summary(mod_sympathy_int_12)
+output <- Anova(mod_sympathy_int_12)
+output
+
+confint(mod_sympathy_int_12)
+
+adjustedpsymp_int_12 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_12
+
+####Interacion 13: nudge * flood ----
+mod_sympathy_int_13<- lm(sympathy ~ nudge *
+                             meanflood +
+                             climate_scores +
+                             ego + 
+                             experience + 
+                             social_norm +
+                             connectedness +
+                             efficacy +
+                             message_framing + 
+                             finance_security + 
+                             age +
+                             gender +
+                             ethnicity +
+                             education_rank +
+                             MD_index, data = combined_data)
+autoplot(mod_sympathy_int_13)
+summary(mod_sympathy_int_13)
+output <- Anova(mod_sympathy_int_13)
+output
+
+confint(mod_sympathy_int_13)
+
+adjustedpsymp_int_13 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_13
+
+####Interacion 14: nudge * social norm ----
+mod_sympathy_int_14<- lm(sympathy ~ nudge *
+                           social_norm +
+                           meanflood +
+                           climate_scores +
+                           ego + 
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           message_framing + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           MD_index, data = combined_data)
+autoplot(mod_sympathy_int_14)
+summary(mod_sympathy_int_14)
+output <- Anova(mod_sympathy_int_14)
+output
+
+confint(mod_sympathy_int_14)
+
+adjustedpsymp_int_14 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpsymp_int_14
+
+
+##Behaviour models----
+
+###Main ----
+mod_behaviour_main<- lm(behaviour ~ message_framing +
+                          nudge + 
+                          efficacy + 
+                          connectedness + 
+                          social_norm +
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores+ 
+                          meanflood+
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_main) #ok
+summary(mod_behaviour_main)
+output <- Anova(mod_behaviour_main)
+output
+
+confint(mod_behaviour_main)
+
+adjustedpbehav <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 12)
+adjustedpbehav #check FDR adjusted
+
+list_pvalues_behav_int <- c("0.500",
+                            "0.092",
+                            "0.593",
+                            "0.845",
+                            "0.426",
+                            "0.063",
+                            "0.900",
+                            "0.593",
+                            "0.524",
+                            "0.809",
+                            "0.013",
+                            "0.736",
+                            "0.683",
+                            "0.128",
+                            "0.909",
+                            output$`Pr(>F)`)
+
+adjustedpbehav.int <- round(p.adjust(list_pvalues_behav_int,method="fdr"), digits = 4)
+adjustedpbehav.int #check FDR adjusted
+
+###Interactions with MF----
+
+####Interaction 1: MF and nudge----
+mod_behaviour_int_1<- lm(behaviour ~ message_framing *
+                          nudge + 
+                          efficacy + 
+                          social_norm + 
+                          connectedness + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_1)
+summary(mod_behaviour_int_1)
+output <- Anova(mod_behaviour_int_1)
+output
+
+confint(mod_behaviour_int_1)
+
+adjustedpbhav_int_1 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_1
+
+####Interaction 2: MF and self efficacy----
+mod_behaviour_int_2<- lm(behaviour ~ message_framing *
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          connectedness + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_2)
+summary(mod_behaviour_int_2)
+output <- Anova(mod_behaviour_int_2)
+output
+
+confint(mod_behaviour_int_2)
+
+adjustedpbhav_int_2 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_2
+
+####Interacion 3: MF * connection ----
+mod_behaviour_int_3<- lm(behaviour ~ message_framing *
+                          connectedness +
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          ego + 
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_3)
+summary(mod_behaviour_int_3)
+output <- Anova(mod_behaviour_int_3)
+output
+
+confint(mod_behaviour_int_3)
+
+adjustedpbhav_int_3 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_3
+
+####Interacion 4: MF * experience of developing countries ----
+mod_behaviour_int_4<- lm(behaviour ~ message_framing *
+                          experience + 
+                          connectedness +
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          ego + 
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_4)
+summary(mod_behaviour_int_4)
+output <- Anova(mod_behaviour_int_4)
+output
+
+confint(mod_behaviour_int_4)
+
+adjustedpbhav_int_4 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_4
+
+####Interacion 5: MF * benefits ----
+mod_behaviour_int_5<- lm(behaviour ~ message_framing *
+                          ego + 
+                          experience + 
+                          connectedness +
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_5)
+summary(mod_behaviour_int_5)
+output <- Anova(mod_behaviour_int_5)
+output
+
+confint(mod_behaviour_int_5)
+
+adjustedpbhav_int_5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_5
+
+####Interacion 6: MF * climate scores ----
+mod_behaviour_int_6<- lm(behaviour ~ message_framing *
+                          climate_scores +
+                          ego + 
+                          experience + 
+                          connectedness +
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_6)
+summary(mod_behaviour_int_6)
+output <- Anova(mod_behaviour_int_6)
+output
+
+confint(mod_behaviour_int_6)
+
+adjustedpbhav_int_6 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_6
+
+####Interacion 7: MF * flood ----
+mod_behaviour_int_7<- lm(behaviour ~ message_framing *
+                          meanflood +
+                          climate_scores +
+                          ego + 
+                          experience + 
+                          connectedness +
+                          efficacy +
+                          social_norm + 
+                          nudge + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_7)
+summary(mod_behaviour_int_7)
+output <- Anova(mod_behaviour_int_7)
+output
+
+confint(mod_behaviour_int_7)
+
+adjustedpbhav_int_7 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_7
+
+####Interacion 7: MF * social norm ----
+mod_behaviour_int_7.5<- lm(behaviour ~ message_framing *
+                           social_norm +
+                           meanflood +
+                           climate_scores +
+                           ego + 
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           nudge + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_7.5)
+summary(mod_behaviour_int_7.5)
+output <- Anova(mod_behaviour_int_7.5)
+output
+
+confint(mod_behaviour_int_7.5)
+
+adjustedpbhav_int_7.5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_7.5
+
+### Interactions with nudge ----
+####Interaction 8: nudge and self efficacy----
+mod_behaviour_int_8<- lm(behaviour ~ nudge*
+                          efficacy +
+                          message_framing + 
+                          connectedness + 
+                          finance_security + 
+                          age +
+                          gender +
+                          ethnicity +
+                          education_rank +
+                          experience + 
+                          social_norm + 
+                          ego + 
+                          climate_scores + 
+                          meanflood +
+                          MD_index, data = combined_data)
+autoplot(mod_behaviour_int_8)
+summary(mod_behaviour_int_8)
+output <- Anova(mod_behaviour_int_8)
+output
+
+confint(mod_behaviour_int_8)
+
+adjustedpbhav_int_8 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_8
+
+####Interacion 9: Nudge * connection ----
+mod_behaviour_int_9 <- lm(behaviour ~ nudge *
+                           connectedness +
+                           efficacy +
+                           message_framing + 
+                           finance_security +
+                           social_norm + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           climate_scores + 
+                           meanflood +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_9)
+summary(mod_behaviour_int_9)
+output <- Anova(mod_behaviour_int_9)
+output
+
+confint(mod_behaviour_int_9)
+
+adjustedpbhav_int_9 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_9
+
+####Interacion 10: nudge * experience of developing countries ----
+mod_behaviour_int_10<- lm(behaviour ~ nudge *
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           social_norm + 
+                           message_framing  + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           ego + 
+                           climate_scores + 
+                           meanflood +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_10)
+summary(mod_behaviour_int_10)
+output <- Anova(mod_behaviour_int_10)
+output
+
+confint(mod_behaviour_int_10)
+
+adjustedpbhav_int_10 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_10
+
+####Interacion 11: nudge * benefits ----
+mod_behaviour_int_11<- lm(behaviour ~  nudge *
+                           ego + 
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           social_norm + 
+                           message_framing + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           climate_scores + 
+                           meanflood +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_11)
+summary(mod_behaviour_int_11)
+output <- Anova(mod_behaviour_int_11)
+output
+
+confint(mod_behaviour_int_11)
+
+adjustedpbhav_int_11 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_11
+
+####Interacion 12: nudge * climate scores ----
+mod_behaviour_int_12<- lm(behaviour ~  nudge *
+                           climate_scores +
+                           ego + 
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           social_norm + 
+                           message_framing + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           meanflood +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_12)
+summary(mod_behaviour_int_12)
+output <- Anova(mod_behaviour_int_12)
+output
+
+confint(mod_behaviour_int_12)
+
+adjustedpbhav_int_12 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_12
+
+####Interacion 13: nudge * flood ----
+mod_behaviour_int_13<- lm(behaviour ~ nudge *
+                           meanflood +
+                           climate_scores +
+                           ego + 
+                           experience + 
+                           connectedness +
+                           efficacy +
+                           social_norm + 
+                           message_framing + 
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           MD_index, data = combined_data)
+autoplot(mod_behaviour_int_13)
+summary(mod_behaviour_int_13)
+output <- Anova(mod_behaviour_int_13)
+output
+
+confint(mod_behaviour_int_13)
+
+adjustedpbhav_int_13 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_13
+
+####Interacion 14: nudge * social norm ----
+mod_behaviour_int_14<- lm(behaviour ~ nudge *
+                            social_norm +
+                            meanflood +
+                            climate_scores +
+                            ego + 
+                            experience + 
+                            connectedness +
+                            efficacy +
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data)
+autoplot(mod_behaviour_int_14)
+summary(mod_behaviour_int_14)
+output <- Anova(mod_behaviour_int_14)
+output
+
+confint(mod_behaviour_int_14)
+
+adjustedpbhav_int_14 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpbhav_int_14
+
+##Financial models----
+
+###Main ----
+mod_financial_main<- glm(financial ~ message_framing+
+                           nudge + 
+                           efficacy + 
+                           connectedness + 
+                           log(1 + social_norm_donation) +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           climate_scores + 
+                           meanflood+
+                           MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_main)
+summary(mod_financial_main)
+output <- Anova(mod_financial_main, test = "F")
+output
+
+with(summary(mod_financial_main), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_main, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_main)
+
+adjustedpfin <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 11)
+adjustedpfin
+
+###Interactions with MF ----
+
+#### Interaction 1: MF + nudge ----
+mod_financial_int_1<- glm(financial ~ message_framing*
+                           nudge + 
+                           efficacy + 
+                           connectedness + 
+                           log(1 + social_norm_donation) +
+                           finance_security + 
+                           age +
+                           gender +
+                           ethnicity +
+                           education_rank +
+                           experience + 
+                           ego + 
+                           climate_scores + 
+                           meanflood+
+                           MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_1)
+summary(mod_financial_int_1)
+output <- Anova(mod_financial_int_1, test = "F")
+output
+
+with(summary(mod_financial_int_1), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_1, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_1)
+
+adjustedpfin_int_1 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_1
+
+####Interaction 2: MF + efficacy ----
+mod_financial_int_2<- glm(financial ~ message_framing*
+                            efficacy + 
+                            nudge + 
+                            connectedness + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_2)
+summary(mod_financial_int_2)
+output <- Anova(mod_financial_int_2, test = "F")
+output
+
+with(summary(mod_financial_int_2), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_2, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_2)
+
+adjustedpfin_int_2 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_2
+
+#### Interaction 3: MF + connection ----
+mod_financial_int_3<- glm(financial ~ message_framing*
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_3)
+summary(mod_financial_int_3)
+output <- Anova(mod_financial_int_3, test = "F")
+output
+
+with(summary(mod_financial_int_3), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_3, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_3)
+
+adjustedpfin_int_3 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_3
+
+####Interaction 4: MF + experience -----
+mod_financial_int_4<- glm(financial ~ message_framing*
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_4)
+summary(mod_financial_int_4)
+output <- Anova(mod_financial_int_4, test = "F")
+output
+
+with(summary(mod_financial_int_4), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_4, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_4)
+
+adjustedpfin_int_4 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_4
+
+####Interaction 5: benefits ----
+mod_financial_int_5<- glm(financial ~ message_framing*
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_5)
+summary(mod_financial_int_5)
+output <- Anova(mod_financial_int_5, test = "F")
+output
+
+with(summary(mod_financial_int_5), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_5, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_5)
+
+adjustedpfin_int_5 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_5
+
+####interaction 6 - MF + social norm ----
+mod_financial_int_6<- glm(financial ~ message_framing*
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_6)
+summary(mod_financial_int_6)
+output <- Anova(mod_financial_int_6, test = "F")
+output
+
+with(summary(mod_financial_int_6), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_6, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_6)
+
+adjustedpfin_int_6 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_6
+
+####interaction 7 - MF + climate scores ----
+mod_financial_int_7<- glm(financial ~ message_framing*
+                            climate_scores + 
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_7)
+summary(mod_financial_int_7)
+output <- Anova(mod_financial_int_7, test = "F")
+output
+
+with(summary(mod_financial_int_7), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_7, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_7)
+
+adjustedpfin_int_7 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_7
+
+####interaction 8 - MF + flood ----
+mod_financial_int_8<- glm(financial ~ message_framing*
+                            meanflood+
+                            climate_scores + 
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            nudge + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_8)
+summary(mod_financial_int_8)
+output <- Anova(mod_financial_int_8, test = "F")
+output
+
+with(summary(mod_financial_int_8), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_8, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_8)
+
+adjustedpfin_int_8 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_8
+
+### Interactions with nudge ----
+####Interaction 9: nudge + efficacy ----
+mod_financial_int_9<- glm(financial ~ nudge*
+                            efficacy + 
+                            message_framing + 
+                            connectedness + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_9)
+summary(mod_financial_int_9)
+output <- Anova(mod_financial_int_9, test = "F")
+output
+
+with(summary(mod_financial_int_9), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_9, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_9)
+
+adjustedpfin_int_9 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_9
+
+#### Interaction 10: nudge + connection ----
+mod_financial_int_10<- glm(financial ~ nudge*
+                            connectedness +
+                            efficacy + 
+                            message_framing + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            experience + 
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_10)
+summary(mod_financial_int_10)
+output <- Anova(mod_financial_int_10, test = "F")
+output
+
+with(summary(mod_financial_int_10), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_10, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_10)
+
+adjustedpfin_int_10 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_10
+
+####Interaction 11: nudge + experience -----
+mod_financial_int_11<- glm(financial ~ nudge*
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            message_framing + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            ego + 
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_11)
+summary(mod_financial_int_11)
+output <- Anova(mod_financial_int_11, test = "F")
+output
+
+with(summary(mod_financial_int_11), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_11, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_11)
+
+adjustedpfin_int_11 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_11
+
+####Interaction 12: nudge + benefits ----
+mod_financial_int_12<- glm(financial ~ nudge*
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            message_framing + 
+                            log(1 + social_norm_donation) +
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_12)
+summary(mod_financial_int_12)
+output <- Anova(mod_financial_int_12, test = "F")
+output
+
+with(summary(mod_financial_int_12), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_12, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_12)
+
+adjustedpfin_int_12 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_12
+
+####interaction 13 - nudge + social norm ----
+mod_financial_int_13<- glm(financial ~ nudge*
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            message_framing+ 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            climate_scores + 
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_13)
+summary(mod_financial_int_13)
+output <- Anova(mod_financial_int_13, test = "F")
+output
+
+with(summary(mod_financial_int_13), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_13, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_13)
+
+adjustedpfin_int_13 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_13
+
+####interaction 14 - nudge + climate scores ----
+mod_financial_int_14<- glm(financial ~ nudge*
+                            climate_scores + 
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            meanflood+
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_14)
+summary(mod_financial_int_14)
+output <- Anova(mod_financial_int_14, test = "F")
+output
+
+with(summary(mod_financial_int_14), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_14, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_14)
+
+adjustedpfin_int_14 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_14
+
+####interaction 15 - nudge + flood ----
+mod_financial_int_15<- glm(financial ~ nudge*
+                            meanflood+
+                            climate_scores + 
+                            log(1 + social_norm_donation) +
+                            ego + 
+                            experience +
+                            connectedness +
+                            efficacy + 
+                            message_framing + 
+                            finance_security + 
+                            age +
+                            gender +
+                            ethnicity +
+                            education_rank +
+                            MD_index, data = combined_data, family = quasipoisson)
+par(mfrow=c(2,2))
+plot(mod_financial_int_15)
+summary(mod_financial_int_15)
+output <- Anova(mod_financial_int_15, test = "F")
+output
+
+with(summary(mod_financial_int_15), 1 - deviance/null.deviance) #R^2 value
+mod_0<- glm(financial ~ 1, data = combined_data, family = quasipoisson)
+anova(mod_financial_int_15, mod_0, test="F") #F stats and p-value
+
+confint(mod_financial_int_15)
+
+adjustedpfin_int_15 <- round(p.adjust(output$`Pr(>F)`,method="fdr"), digits = 4)
+adjustedpfin_int_15
+
+#check for overdispersion
+#summary(mod_financial_int1)$deviance/summary(mod_financial)$df.residual
+#Anova(mod_financial_int1, test = "F"
 
 #Create output table for manuscript---------------------------------------------
 
