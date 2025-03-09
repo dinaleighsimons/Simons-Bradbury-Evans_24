@@ -2072,7 +2072,7 @@ nudge.sympathy <- combined_data %>%
 ##Nudge plot----
 
 nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
-  scale_color_manual(values=c("grey40", "sky blue"), 
+  scale_color_manual(values=c("#048A81", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("absent", "present"),
                      labels=c("Absent", "Present"))+
@@ -2099,7 +2099,7 @@ nf <- ggplot(nudge.finance, aes(x=nudge, y=mean, colour = nudge))+
 nf
 
 ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
-  scale_color_manual(values=c("grey40", "sky blue"), 
+  scale_color_manual(values=c("#048A81", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("absent", "present"),
                      labels=c("Absent", "Present"))+
@@ -2112,7 +2112,7 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
         legend.position = "none",
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
-  xlab("Nudge") + ylab("Advert sufficiency")+
+  xlab("Nudge") + ylab("Advertisement sufficiency")+
  #ylim(11.3,13)+
   scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
                      #sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
@@ -2127,7 +2127,7 @@ ns <- ggplot(nudge.sufficiency, aes(x=nudge, y=mean, colour = nudge))+
 ns
 
 nsym <- ggplot(nudge.sympathy, aes(x=nudge, y=mean, colour = nudge))+
-  scale_color_manual(values=c("grey40", "sky blue"), 
+  scale_color_manual(values=c("#048A81", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("absent", "present"),
                      labels=c("Absent", "Present"))+
@@ -2150,7 +2150,7 @@ nsym
 
 
 nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
-  scale_color_manual(values=c("grey40", "sky blue"), 
+  scale_color_manual(values=c("#048A81", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("absent", "present"),
                      labels=c("Absent", "Present"))+
@@ -2161,7 +2161,7 @@ nb <- ggplot(nudge.behaviour, aes(x=nudge, y=mean, colour = nudge))+
   theme_classic()+
   theme(text = element_text(size = 13),
         legend.position = "none")+
-  xlab("Nudge") + ylab("Behavioural support")+
+  xlab("Nudge") + ylab("Behavioral support")+
   #ylim(51,56.2)+
   scale_y_continuous(breaks = seq(0, 8, by=0.08), limits=c(3.4,3.9))+
                      #sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.3)))+
@@ -2181,7 +2181,7 @@ nudge_plot <- ggarrange(ns, nsym, nf, nb,
                         ncol = 2, nrow = 2,
                         align = 'v')
 nudge_plot
-ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 6)
+ggsave(path = "Figures", filename = "nudge.png", nudge_plot, height =8, width = 6, dpi = 300)
 
 
 ##Mean and SE summary for message framing----
@@ -2243,10 +2243,10 @@ message.summary$message_framing = as.factor(message.summary$message_framing)
 
 
 mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_framing))+
-  scale_color_manual(values=c("grey40", "sky blue", "grey60"), 
+  scale_color_manual(values=c("#048A81","#8A89C0", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("biodiversity", "es-global", "es-local"),
-                     labels=c("Biodiversity", "ES-global", "ES-local"))+
+                     labels=c("Biodiversity", "ES global", "ES local"))+
   geom_pointrange(ymin=message.finance$mean-message.finance$se, 
                   ymax=message.finance$mean+message.finance$se,
                   size = 1.5)+
@@ -2258,15 +2258,15 @@ mf <- ggplot(message.finance, aes(x=message_framing, y=mean, colour = message_fr
   #ylim(0.95,1.26)+
   scale_y_continuous(breaks = seq(0, 1.26, by=0.05), limits=c(0.95,1.26))+
                      #sec.axis = sec_axis(~ . * 72.78892, name = "Equivalent donation (£)\n ", breaks = seq(0, 1100, by=3.50)))+
-  scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
+  scale_x_discrete(labels = c("Biodiversity","ES global", "ES local"))
 
 mf
 
 ms <- ggplot(message.sufficiency, aes(x=message_framing, y=mean, colour = message_framing))+
-  scale_color_manual(values=c("grey40", "sky blue", "grey60"), 
+  scale_color_manual(values=c("#048A81","#8A89C0", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("biodiversity", "es-global", "es-local"),
-                     labels=c("Biodiversity", "ES-global", "ES-local"))+
+                     labels=c("Biodiversity", "ES global", "ES local"))+
   geom_pointrange(ymin=message.sufficiency$mean-message.sufficiency$se, 
                   ymax=message.sufficiency$mean+message.sufficiency$se,
                   size = 1.5)+
@@ -2276,19 +2276,19 @@ ms <- ggplot(message.sufficiency, aes(x=message_framing, y=mean, colour = messag
         legend.position = "none",
         axis.title.x = element_blank(), 
         axis.text.x = element_blank())+
-  xlab(" \n Message framing") + ylab("Advert sufficiency")+
+  xlab(" \n Message framing") + ylab("Advertisement sufficiency")+
   #ylim(11.3,13)+
   scale_y_continuous(breaks = seq(0, 13, by=0.25), limits=c(11.35,13))+
                      #sec.axis = sec_axis(~ ., name = "Equivalent score\n ", breaks = seq(0, 13, by=0.25)))+
-  scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
+  scale_x_discrete(labels = c("Biodiversity","ES global", "ES local"))
 ms
 
 
 msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message_framing))+
-  scale_color_manual(values=c("grey40", "sky blue", "grey60"), 
+  scale_color_manual(values=c("#048A81","#8A89C0", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("biodiversity", "es-global", "es-local"),
-                     labels=c("Biodiversity", "ES-global", "ES-local"))+
+                     labels=c("Biodiversity", "ES global", "ES local"))+
   geom_pointrange(ymin=message.sympathy$mean-message.sympathy$se, 
                   ymax=message.sympathy$mean+message.sympathy$se,
                   size = 1.5)+
@@ -2302,15 +2302,15 @@ msym <- ggplot(message.sympathy, aes(x=message_framing, y=mean, colour = message
   #ylim(31.2,32.6)+
   scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(6.2,6.5))+
                      #sec.axis = sec_axis(~ . * 2.541596, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
-  scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
+  scale_x_discrete(labels = c("Biodiversity","ES global", "ES local"))
 
 msym
 
 mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_framing))+
-  scale_color_manual(values=c("grey40", "sky blue", "grey60"), 
+  scale_color_manual(values=c("#048A81","#8A89C0", "#CDA2AB"), 
                      name="Treatment",
                      breaks=c("biodiversity", "es-global", "es-local"),
-                     labels=c("Biodiversity", "ES-global", "ES-local"))+
+                     labels=c("Biodiversity", "ES global", "ES local"))+
   geom_pointrange(ymin=message.behaviour$mean-message.behaviour$se, 
                   ymax=message.behaviour$mean+message.behaviour$se,
                   size=1.5)+
@@ -2318,11 +2318,11 @@ mb <- ggplot(message.behaviour, aes(x=message_framing, y=mean, colour = message_
   theme_classic()+
   theme(text = element_text(size = 13),
         legend.position = "none")+
-  xlab(" \n Message framing") + ylab("Behavioural support")+
+  xlab(" \n Message framing") + ylab("Behavioral support")+
   #ylim(51,56.2)+
   scale_y_continuous(breaks = seq(0, 8, by=0.05), limits=c(3.5,3.8))+
                      #sec.axis = sec_axis(~ . * 2.776812, name = "Equivalent score\n ", breaks = seq(0, 20, by=0.15)))+
-  scale_x_discrete(labels = c("Biodiversity","ES-global", "ES-local"))
+  scale_x_discrete(labels = c("Biodiversity","ES global", "ES local"))
 
 mb
 
@@ -2331,7 +2331,7 @@ message_plot <- ggarrange(ms, msym, mf, mb,
                           ncol = 2, nrow = 2,
                           align = 'v')
 message_plot
-ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =7)
+ggsave(path = "Figures", filename = "new_message_plot.png", message_plot, height =9, width =7, dpi = 300)
 
 ##Scatter plots----
 
@@ -2411,7 +2411,7 @@ climateplot
 #not using pred
 nature_symp <- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T, color = "green3")+
+  geom_smooth(method = "lm", se=T, color = "#048A81")+
   theme_classic()+
   labs(x = "Nature connection", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
@@ -2422,7 +2422,7 @@ nature_symp <- ggplot(combined_data, aes(x=connectedness, y=sympathy))+
                                               #labels = c("Biodiversity", "ES-global", "ES-local"))
 nature_symp
 
----- sympathy ~ efficacy
+#---- sympathy ~ efficacy
 #updated plot using pred
 #symp.mod.3 <- lm(sympathy ~ efficacy, data = combined_data)
 #anova(symp.mod.3)
@@ -2431,14 +2431,14 @@ nature_symp
 #pred.data.symp.3
 
 #ggplot(pred.data.symp.3, aes(x = efficacy, y = sympathy)) + 
-  #geom_line(color = "green3", size = 1) + geom_point(data = combined_data) + 
+  #geom_line(color = "#048A81", size = 1) + geom_point(data = combined_data) + 
   #xlab("Self-efficacy") + ylab("Sympathetic attitudes") +
   #theme_classic()
 
 #using in-built
 efficacy_symp<- ggplot(combined_data, aes(x=efficacy, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T, color = "green3")+
+  geom_smooth(method = "lm", se=T, color = "#048A81")+
   theme_classic()+
   labs(x = "Self-efficacy", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
@@ -2450,7 +2450,7 @@ efficacy_symp
 
 social_symp <- ggplot(combined_data, aes(x=social_norm, y=sympathy))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T, color = "green3")+
+  geom_smooth(method = "lm", se=T, color = "#048A81")+
   theme_classic()+
   labs(x = "Social norm support", y = "Sympathetic attitudes")+
   theme(text = element_text(size = 15),
@@ -2480,7 +2480,7 @@ nature_fin<- ggplot(combined_data, aes(x=connectedness, y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
               method.args = list(family = "quasipoisson"),
-              color = "red4")+
+              color = "#CDA2AB")+
   theme_classic()+
   labs(x = "Nature connection", y = "Financial support")+
   theme(text = element_text(size = 15),
@@ -2496,7 +2496,7 @@ efficacy_fin<- ggplot(combined_data, aes(x=efficacy, y=financial))+
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
               method.args = list(family = "quasipoisson"),
-              color = "red4")+
+              color = "#CDA2AB")+
   theme_classic()+
   labs(x = "Self-efficacy", y = "Finanical support")+
   theme(text = element_text(size = 15),
@@ -2524,7 +2524,7 @@ social_fin <- ggplot(combined_data, aes(x=log(1+social_norm_donation), y=financi
   geom_point(alpha=0.2)+
   geom_smooth(method = "glm", se=T,
               method.args = list(family = "quasipoisson"),
-              color = "red4")+
+              color = "#CDA2AB")+
   theme_classic()+
   labs(x = "Social norm donation (transformed) ", y = "Finanical support")+
   theme(text = element_text(size = 15),
@@ -2543,9 +2543,9 @@ suppressWarnings(print(social_fin))
 
 nature_behav<- ggplot(combined_data, aes(x=connectedness, y=behaviour))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T,  color = "#8A89C0")+
   theme_classic()+
-  labs(x = "Nature connection", y = "Behavioural support")+
+  labs(x = "Nature connection", y = "Behavioral support")+
   theme(text = element_text(size = 15))+
   guides(color=guide_legend("Message framing"), fill = "none")
 
@@ -2553,9 +2553,9 @@ nature_behav
 
 efficacy_behav<- ggplot(combined_data, aes(x=efficacy, y=behaviour))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T,  color = "#8A89C0")+
   theme_classic()+
-  labs(x = "Self-efficacy", y = "Behavioural support")+
+  labs(x = "Self-efficacy", y = "Behavioral support")+
   theme(text = element_text(size = 15),
         axis.title.y = element_blank())+
   guides(color=guide_legend("Message framing"), fill = "none")
@@ -2564,9 +2564,9 @@ efficacy_behav
 
 social_behav <- ggplot(combined_data, aes(x=social_norm, y=behaviour))+
   geom_point(alpha=0.2)+
-  geom_smooth(method = "lm", se=T)+
+  geom_smooth(method = "lm", se=T,  color = "#8A89C0")+
   theme_classic()+
-  labs(x = "Social norm support", y = "Behavioural support")+
+  labs(x = "Social norm support", y = "Behavioral support")+
   theme(text = element_text(size = 15),
         axis.title.y = element_blank())+
   guides(color=guide_legend("Message framing"), fill = "none")
@@ -2583,7 +2583,7 @@ scatter_plot <- suppressWarnings(ggarrange(nature_symp, efficacy_symp, social_sy
 suppressWarnings(print(scatter_plot))
 ##warnings ok - limited axis to not present extreme values to improve visualization
 
-ggsave("Figures/scatter_plot.png", scatter_plot, height =10, width =12)
+ggsave("Figures/scatter_plot.png", scatter_plot, height =11, width =13, dpi = 300)
 
 #warnings ok - removed extreme values to make visualization easier
 
